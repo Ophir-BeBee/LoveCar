@@ -1,0 +1,70 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\SaveController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PostLikeController;
+use App\Http\Controllers\ArticleLikeController;
+use App\Http\Controllers\ShopController;
+
+Route::controller(UserController::class)->group(function(){
+    Route::post('/login','login');
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    //feed
+    Route::group(["prefix" => "posts", "controller" => PostController::class], function() {
+        //posts
+        Route::get('/','index');
+        Route::post('/','store');
+        Route::post('/show','show');
+        Route::post('/update','update');
+        Route::delete('/','destroy');
+
+        //likes
+        Route::group(["prefix" => "likes", "controller" => PostLikeController::class],function(){
+            Route::post('/','store');
+            Route::delete('/','destroy');
+        });
+
+        //comments
+        Route::group(["prefix" => "comments", "controller" => CommentController::class],function(){
+            Route::post('/','store');
+            Route::delete('/','destroy');
+        });
+
+        //saves
+        Route::group(["prefix" => "saves", "controller" => SaveController::class],function(){
+            Route::get('/','index');
+            Route::post('/','store');
+            Route::delete('/','destroy');
+        });
+    });
+
+    //news
+    Route::group(["prefix" => "articles", "controller" => ArticleController::class],function(){
+        //articles
+        Route::get('/','index');
+        Route::post('/','store');
+        Route::post('/show','show');
+        Route::post('/update','update');
+        Route::delete('/','destroy');
+
+        //likes
+        Route::group(["prefix" => "likes", "controller" => ArticleLikeController::class],function(){
+            Route::post('/','store');
+            Route::delete('/','destroy');
+        });
+    });
+
+    //shops
+    Route::group(["prefix" => "shops", "controller" => ShopController::class],function(){
+        Route::get('/','index');
+        Route::post('/','store');
+    });
+
+});

@@ -1,0 +1,233 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use App\Models\PostImage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\PostCreateRequest;
+use App\Http\Requests\PostDeleteRequest;
+use App\Http\Requests\PostUpdateRequest;
+use App\Models\PostView;
+
+class PostController extends Controller
+{
+
+    protected $model;
+
+    public function __construct(Post $model)
+    {
+        $this->model = $model;
+    }
+
+    //get all posts
+    public function index(){
+        return response()->json([
+            'data' => $this->model
+            ->with('user:id,name')
+            ->with('post_images')
+            ->withCount('post_likes')
+            ->withCount('comments')
+            ->orderBy('id','desc')
+            ->get(),
+            'status' => 200
+        ]);
+    }
+
+    //post show
+    public function show(Request $request){
+        //get post data
+        $post = $this->model
+        ->where('id',$request->id)
+        ->withCount('post_likes')
+        ->withCount('comments')
+        ->with(['comments' => function($query) {
+            $query->with('user:id,name');
+            $query->orderBy('id','desc');
+        }])
+        ->first();
+
+        //increase view
+        PostView::create([
+            'user_id' => Auth::user()->id,
+            'post_id' => $request->id
+        ]);
+        return response()->json([
+            'post' => $post,
+            'status' => 200
+        ]);
+    }
+
+    //create posts
+    public function store(PostCreateRequest $request){
+        //user authorization
+        if(Gate::denies('auth-post')){
+            return response()->json([
+                'message' => 'Not allowed',
+                'status' => 401
+            ]);
+        }
+
+        //create data of posts
+        $data = $this->changePostCreateDataToArray($request);
+        $post = $this->model->create($data);
+
+        //check photos inclued or not
+        $images = array();
+        if($request->file('image')){
+
+            $imageFile = $request->file('image');
+
+            //four images validation
+            $imageCount = count($imageFile);
+            if($imageCount>4){
+                return response()->json([
+                    'message' => "Can't upload more than 4 photos",
+                    'status' => 405
+                ]);
+            }
+
+            //store images
+            for($i=0;$i<$imageCount;$i++){
+                $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
+                $imageFile[$i]->storeAs('public',$imageName);
+                array_push($images,PostImage::create([
+                    'post_id' => $post->id,
+                    'name' => $imageName
+                ]));
+            }
+        }
+
+        return response()->json([
+            'post' => $post,
+            'images' => $images,
+            'message' => 'Post has been created',
+            'status' => 200
+        ]);
+    }
+
+    //update posts
+    public function update(PostUpdateRequest $request){
+
+        //user authorization
+        if(Gate::denies('auth-post')){
+            return response()->json([
+                'message' => 'Not allowed',
+                'status' => 401
+            ]);
+        }
+
+        $post = $this->model->find($request->post_id);
+
+        if(!$post){
+            return response()->json([
+                'message' => 'Post not found',
+                'status' => 404
+            ]);
+        }
+
+        //update data
+        $data = $this->changePostUpdateDataToArray($request);
+        $post->update($data);
+
+        //delete all images which belongs to this post from project folder and database
+        $images_from_db = PostImage::where('post_id',$request->post_id)->get();
+
+        foreach($images_from_db as $image){
+            Storage::delete('public/'.$image->name);
+            $image->delete();
+        }
+
+        //update new images
+        $images = array();
+        if($request->file('image')){
+
+            $imageFile = $request->file('image');
+
+            //four images validation
+            $imageCount = count($imageFile);
+            if($imageCount>4){
+                return response()->json([
+                    'message' => "Can't upload more than 4 photos",
+                    'status' => 405
+                ]);
+            }
+
+            //update images
+            for($i=0;$i<$imageCount;$i++){
+                $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
+                $imageFile[$i]->storeAs('public',$imageName);
+                array_push($images,PostImage::create([
+                    'post_id' => $request->post_id,
+                    'name' => $imageName
+                ]));
+            }
+
+        }
+
+        return response()->json([
+            'post' => $post,
+            'images' => $images,
+            'message' => 'Post has beeen updated',
+            'status' => 200
+        ]);
+
+    }
+
+    //delete posts
+    public function destroy(PostDeleteRequest $request){
+
+        // user authorization
+        if(Gate::denies('auth-post')){
+            return response()->json([
+                'message' => 'Not allowed',
+                'status' => 401
+            ]);
+        }
+
+        //get post first
+        $post = $this->model->find($request->post_id);
+
+        if(!$post){
+            return response()->json([
+                'message' => 'Post not found',
+                'status' => 404
+            ]);
+        }
+
+        //image manual delete
+        $images = PostImage::where('post_id',$request->post_id)->get();
+        foreach($images as $image){
+            Storage::delete('public/'.$image->name);
+            $image->delete();
+        }
+
+        $post->delete();
+        return response()->json([
+            'data' => null,
+            'message' => 'Post has been deleted',
+            'status' => 200
+        ]);
+    }
+
+    //change post data to array
+    private function changePostUpdateDataToArray($request){
+        return [
+            'title' => $request->title,
+            'description' => $request->description
+        ];
+    }
+
+    //change post data to array
+    private function changePostCreateDataToArray($request){
+        return [
+            'user_id' => Auth::user()->id,
+            'title' => $request->title,
+            'description' => $request->description
+        ];
+    }
+
+}
