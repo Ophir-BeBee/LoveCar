@@ -10,6 +10,7 @@ use App\Models\ShopToService;
 use App\Models\ShopToCategory;
 use App\Models\ShopToServices;
 use App\Models\ShopServiceItem;
+use App\Http\Requests\ShopRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -74,7 +75,7 @@ class ShopController extends Controller
     }
 
     //create shops
-    public function store(ShopCreateRequest $request){
+    public function store(ShopRequest $request){
         //user authorization
         if(Gate::denies('auth-shop')){
             return response()->json([
@@ -182,7 +183,7 @@ class ShopController extends Controller
     }
 
     //update shop
-    public function update(ShopUpdateRequest $request){
+    public function update(ShopRequest $request){
         //user authorization
         if(Gate::denies('auth-shop')){
             return response()->json([

@@ -7,6 +7,7 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\CommentRequest;
 use App\Http\Requests\CommentCreateRequest;
 use App\Http\Requests\CommentDeleteRequest;
 use App\Http\Requests\CommentUpdateRequest;
@@ -22,7 +23,7 @@ class CommentController extends Controller
     }
 
     //create comment
-    public function store(CommentCreateRequest $request){
+    public function store(CommentRequest $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
@@ -63,7 +64,7 @@ class CommentController extends Controller
     }
 
     //update comment
-    public function update(CommentUpdateRequest $request){
+    public function update(CommentRequest $request){
         //get comment
         $comment = $this->model->find($request->comment_id);
 

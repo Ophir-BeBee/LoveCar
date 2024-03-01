@@ -3,15 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostView;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
+use App\Http\Requests\PostRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\PostDeleteRequest;
 use App\Http\Requests\PostUpdateRequest;
-use App\Models\PostView;
 
 class PostController extends Controller
 {
@@ -62,7 +63,7 @@ class PostController extends Controller
     }
 
     //create posts
-    public function store(PostCreateRequest $request){
+    public function store(PostRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
             return response()->json([
@@ -116,7 +117,7 @@ class PostController extends Controller
     }
 
     //update posts
-    public function update(PostUpdateRequest $request){
+    public function update(PostRequest $request){
 
         //user authorization
         if(Gate::denies('auth-post')){
