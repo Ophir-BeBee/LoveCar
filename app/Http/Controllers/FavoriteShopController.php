@@ -69,7 +69,7 @@ class FavoriteShopController extends Controller
     }
 
     //delete favorite shop
-    public function destory(Request $request){
+    public function destroy(Request $request){
         //check shop
         $shop = Shop::find($request->shop_id);
         if(!$shop){
