@@ -51,10 +51,10 @@ class ShopController extends Controller
     }
 
     //shop show
-    public function show(Request $request){
+    public function show($id){
         return response()->json([
             'data' => $this->model
-            ->where('id',$request->id)
+            ->where('id',$id)
             ->with(['shop_to_categories' => function($query){
                 $query->select('id','shop_id','shop_category_id');
                 $query->with('shop_category:id,name');

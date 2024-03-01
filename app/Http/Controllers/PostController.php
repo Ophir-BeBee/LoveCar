@@ -38,10 +38,10 @@ class PostController extends Controller
     }
 
     //post show
-    public function show(Request $request){
+    public function show($id){
         //get post data
         $post = $this->model
-        ->where('id',$request->id)
+        ->where('id',$id)
         ->withCount('post_likes')
         ->withCount('comments')
         ->with(['comments' => function($query) {
@@ -54,7 +54,7 @@ class PostController extends Controller
         //increase view
         PostView::create([
             'user_id' => Auth::user()->id,
-            'post_id' => $request->id
+            'post_id' => $id
         ]);
         return response()->json([
             'data' => $post,

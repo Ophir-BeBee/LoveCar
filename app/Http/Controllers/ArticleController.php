@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\Article;
+use App\Models\ArticleView;
+use App\Models\ArticleImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\ArticleRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ArticleUpateRequest;
 use App\Http\Requests\ArticleCreateRequest;
 use App\Http\Requests\ArticleDeleteRequest;
-use App\Models\ArticleImage;
-use App\Models\ArticleView;
 
 class ArticleController extends Controller
 {
@@ -33,17 +34,17 @@ class ArticleController extends Controller
     }
 
     //article show
-    public function show(Request $request){
+    public function show($id){
         //get article data
         $article = $this->model
-        ->where('id',$request->id)
+        ->where('id',$id)
         ->withCount('article_likes')
         ->first();
 
         //increase view
         ArticleView::create([
             'user_id' => Auth::user()->id,
-            'article_id' => $request->id
+            'article_id' => $id
         ]);
 
         return response()->json([
@@ -53,7 +54,7 @@ class ArticleController extends Controller
     }
 
     //create article
-    public function store(ArticleCreateRequest $request){
+    public function store(ArticleRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
             return response()->json([
@@ -102,7 +103,7 @@ class ArticleController extends Controller
     }
 
     //update article
-    public function update(ArticleUpateRequest $request){
+    public function update(ArticleRequest $request){
 
         //user authorization
         if(Gate::denies('auth-post')){

@@ -24,7 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //posts
         Route::get('/','index');
         Route::post('/','store');
-        Route::post('/show','show');
+        Route::get('/{id}','show');
         Route::post('/update','update');
         Route::delete('/','destroy');
 
@@ -54,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //articles
         Route::get('/','index');
         Route::post('/','store');
-        Route::post('/show','show');
+        Route::get('/{id}','show');
         Route::post('/update','update');
         Route::delete('/','destroy');
 
@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //shops
         Route::get('/','index');
         Route::post('/','store');
-        Route::post('/show','show');
+        Route::get('/{id}','show');
         Route::delete('/','destroy');
         Route::post('/update','update');
 
@@ -87,7 +87,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/','index');
         Route::post('/','store');
         Route::delete('/','destroy');
-        Route::post('/show','show');
+        Route::get('/{id}','show');
         Route::post('/update','update');
         Route::post('/read','read');
         Route::post('/hide','hide');

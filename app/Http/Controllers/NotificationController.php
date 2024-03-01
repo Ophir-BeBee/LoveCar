@@ -87,9 +87,9 @@ class NotificationController extends Controller
     }
 
     //notification show
-    public function show(Request $request){
+    public function show($id){
         return response()->json([
-            'notification' => $this->model->find($request->id),
+            'notification' => $this->model->find($id),
             'status' => 200
         ]);
     }
