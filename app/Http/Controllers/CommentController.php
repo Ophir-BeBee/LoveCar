@@ -36,7 +36,7 @@ class CommentController extends Controller
         $data = $this->changeCreateCommentDataToArray($request);
         $comment = $this->model->create($data);
         return response()->json([
-            'comment' => $comment,
+            'data' => $comment,
             'message' => "You've commented on this post",
             'status' => 200
         ]);
@@ -80,7 +80,7 @@ class CommentController extends Controller
             'text' => $request->text
         ]);
         return response()->json([
-            'comment' => $comment,
+            'data' => $comment,
             'message' => 'Comment has been updated',
             'status' => 200
         ]);

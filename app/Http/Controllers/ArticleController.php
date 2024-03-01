@@ -27,7 +27,7 @@ class ArticleController extends Controller
     //get all articles
     public function index(){
         return response()->json([
-            'articles' => $this->model->withCount('article_likes')->orderBy('id','desc')->get(),
+            'data' => $this->model->withCount('article_likes')->orderBy('id','desc')->get(),
             'status' => 200
         ]);
     }
@@ -47,7 +47,7 @@ class ArticleController extends Controller
         ]);
 
         return response()->json([
-            'article' => $article,
+            'data' => $article,
             'status' => 200
         ]);
     }
@@ -92,7 +92,7 @@ class ArticleController extends Controller
         }
 
         return response()->json([
-            'article' => $article
+            'data' => $article
             ->where('id',$article->id)
             ->withCount('article_likes')
             ->first(),
@@ -160,7 +160,7 @@ class ArticleController extends Controller
         }
 
         return response()->json([
-            'article' => $this->model
+            'data' => $this->model
             ->where('id',$request->id)
             ->withCount('article_likes')
             ->first(),

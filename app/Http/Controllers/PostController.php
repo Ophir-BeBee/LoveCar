@@ -47,6 +47,7 @@ class PostController extends Controller
             $query->with('user:id,name');
             $query->orderBy('id','desc');
         }])
+        ->with('post_images')
         ->first();
 
         //increase view
@@ -55,7 +56,7 @@ class PostController extends Controller
             'post_id' => $request->id
         ]);
         return response()->json([
-            'post' => $post,
+            'data' => $post,
             'status' => 200
         ]);
     }
@@ -100,7 +101,7 @@ class PostController extends Controller
         }
 
         return response()->json([
-            'post' => $this->model
+            'data' => $this->model
             ->where('id',$post->id)
             ->withCount('post_likes')
             ->withCount('comments')
@@ -173,7 +174,7 @@ class PostController extends Controller
         }
 
         return response()->json([
-            'post' => $this->model
+            'data' => $this->model
             ->where('id',$post->id)
             ->withCount('post_likes')
             ->withCount('comments')

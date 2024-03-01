@@ -52,7 +52,7 @@ class ShopController extends Controller
     //shop show
     public function show(Request $request){
         return response()->json([
-            'shop' => $this->model
+            'data' => $this->model
             ->where('id',$request->id)
             ->with(['shop_to_categories' => function($query){
                 $query->select('id','shop_id','shop_category_id');
@@ -87,7 +87,7 @@ class ShopController extends Controller
         $shop_categories = $request->shop_categories;
         $shop_services = $request->shop_services;
 
-        //create shop
+        // //create shop
         $data = $this->changeShopCreateDataToArray($request);
         $shop = $this->model->create($data);
 
@@ -102,13 +102,14 @@ class ShopController extends Controller
             $shop->update(['logo'=>null]);
         }
 
-        //insert shop categories
+        // //insert shop categories
         foreach($shop_categories as $shop_category){
             ShopToCategory::create([
                 'shop_id' => $shop->id,
                 'shop_category_id' => $shop_category
             ]);
         }
+
 
         //insert shop services and items
         foreach($shop_services as $shop_service){
@@ -157,7 +158,7 @@ class ShopController extends Controller
         }
 
         return response()->json([
-            'shop' => $this->model
+            'data' => $this->model
             ->where('id',$shop->id)
             ->with(['shop_to_categories' => function($query){
                 $query->select('id','shop_id','shop_category_id');
@@ -290,7 +291,7 @@ class ShopController extends Controller
             }
         }
         return response()->json([
-            'shop' => $this->model
+            'data' => $this->model
             ->where('id',$shop->id)
             ->with(['shop_to_categories' => function($query){
                 $query->select('id','shop_id','shop_category_id');

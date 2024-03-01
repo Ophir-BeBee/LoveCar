@@ -9,7 +9,9 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\FavoriteShopController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ShopController;
+use App\Models\Notification;
 
 Route::controller(UserController::class)->group(function(){
     Route::post('/login','login');
@@ -78,6 +80,17 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/','store');
             Route::delete('/','destroy');
         });
+    });
+
+    //notifications
+    Route::group(["prefix" => "notifications", "controller" => NotificationController::class],function(){
+        Route::get('/','index');
+        Route::post('/','store');
+        Route::delete('/','destroy');
+        Route::post('/show','show');
+        Route::post('/update','update');
+        Route::post('/read','read');
+        Route::post('/hide','hide');
     });
 
 });

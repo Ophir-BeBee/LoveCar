@@ -38,12 +38,13 @@ class ArticleLikeController extends Controller
             ]);
         }
 
-        //create thumb
-        $this->model->create([
+        //create like
+        $data = $this->model->create([
             'user_id' => Auth::user()->id,
             'article_id' => $request->article_id
         ]);
         return response()->json([
+            'data' => $data,
             'message' => 'You liked this article',
             'status' => 200
         ]);
