@@ -67,7 +67,6 @@ class ArticleController extends Controller
         $article = $this->model->create($data);
 
         //check photos inclued or not
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -85,16 +84,18 @@ class ArticleController extends Controller
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,ArticleImage::create([
+                ArticleImage::create([
                     'article_id' => $article->id,
                     'name' => $imageName
-                ]));
+                ]);
             }
         }
 
         return response()->json([
-            'article' => $article,
-            'images' => $images,
+            'article' => $article
+            ->where('id',$article->id)
+            ->withCount('article_likes')
+            ->first(),
             'message' => 'Article has been created',
             'status' => 200
         ]);
@@ -133,7 +134,6 @@ class ArticleController extends Controller
         }
 
         //update new images
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -151,17 +151,19 @@ class ArticleController extends Controller
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,ArticleImage::create([
+                ArticleImage::create([
                     'article_id' => $request->article_id,
                     'name' => $imageName
-                ]));
+                ]);
             }
 
         }
 
         return response()->json([
-            'article' => $article,
-            'images' => $images,
+            'article' => $this->model
+            ->where('id',$request->id)
+            ->withCount('article_likes')
+            ->first(),
             'message' => 'Article has beeen updated',
             'status' => 200
         ]);
@@ -169,23 +171,13 @@ class ArticleController extends Controller
     }
 
         //delete posts
-        public function destroy(ArticleDeleteRequest $request){
+        public function destroy(Request $request){
 
             // user authorization
             if(Gate::denies('auth-post')){
                 return response()->json([
                     'message' => 'Not allowed',
                     'status' => 401
-                ]);
-            }
-
-            //get post first
-            $article = $this->model->find($request->article_id);
-
-            if(!$article){
-                return response()->json([
-                    'message' => 'Article not found',
-                    'status' => 404
                 ]);
             }
 
@@ -196,7 +188,7 @@ class ArticleController extends Controller
                 $image->delete();
             }
 
-            $article->delete();
+            $this->model->find($request->article_id)->delete();
             return response()->json([
                 'data' => null,
                 'message' => 'Article has been deleted',

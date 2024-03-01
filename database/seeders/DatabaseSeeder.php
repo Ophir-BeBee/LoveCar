@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         ShopService::create([
-            'name' => 'Servies'
+            'name' => 'Services'
         ]);
 
         ShopService::create([

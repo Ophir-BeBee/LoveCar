@@ -22,7 +22,6 @@ class ArticleUpateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'article_id' => 'required',
             'title' => ['required','string'],
             'description' => ['required','string'],
             // 'photo' => ['mimes:png,jpg.jpeg,webp']

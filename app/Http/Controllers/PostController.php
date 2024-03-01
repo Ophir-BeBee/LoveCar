@@ -27,7 +27,6 @@ class PostController extends Controller
     public function index(){
         return response()->json([
             'data' => $this->model
-            ->with('user:id,name')
             ->with('post_images')
             ->withCount('post_likes')
             ->withCount('comments')
@@ -76,7 +75,6 @@ class PostController extends Controller
         $post = $this->model->create($data);
 
         //check photos inclued or not
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -94,16 +92,23 @@ class PostController extends Controller
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,PostImage::create([
+                PostImage::create([
                     'post_id' => $post->id,
                     'name' => $imageName
-                ]));
+                ]);
             }
         }
 
         return response()->json([
-            'post' => $post,
-            'images' => $images,
+            'post' => $this->model
+            ->where('id',$post->id)
+            ->withCount('post_likes')
+            ->withCount('comments')
+            ->with(['comments' => function($query) {
+                $query->with('user:id,name');
+                $query->orderBy('id','desc');
+            }])
+            ->first(),
             'message' => 'Post has been created',
             'status' => 200
         ]);
@@ -142,7 +147,6 @@ class PostController extends Controller
         }
 
         //update new images
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -160,17 +164,24 @@ class PostController extends Controller
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,PostImage::create([
+                PostImage::create([
                     'post_id' => $request->post_id,
                     'name' => $imageName
-                ]));
+                ]);
             }
 
         }
 
         return response()->json([
-            'post' => $post,
-            'images' => $images,
+            'post' => $this->model
+            ->where('id',$post->id)
+            ->withCount('post_likes')
+            ->withCount('comments')
+            ->with(['comments' => function($query) {
+                $query->with('user:id,name');
+                $query->orderBy('id','desc');
+            }])
+            ->first(),
             'message' => 'Post has beeen updated',
             'status' => 200
         ]);
@@ -178,23 +189,13 @@ class PostController extends Controller
     }
 
     //delete posts
-    public function destroy(PostDeleteRequest $request){
+    public function destroy(Request $request){
 
         // user authorization
         if(Gate::denies('auth-post')){
             return response()->json([
                 'message' => 'Not allowed',
                 'status' => 401
-            ]);
-        }
-
-        //get post first
-        $post = $this->model->find($request->post_id);
-
-        if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
             ]);
         }
 
@@ -205,7 +206,7 @@ class PostController extends Controller
             $image->delete();
         }
 
-        $post->delete();
+        $this->model->find($request->post_id)->delete();
         return response()->json([
             'data' => null,
             'message' => 'Post has been deleted',

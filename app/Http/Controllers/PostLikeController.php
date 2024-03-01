@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\LikeCreateRequest;
-use App\Http\Requests\LikeDeleteRequest;
 use App\Models\PostLike;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class PostLikeController extends Controller
 {
@@ -19,7 +18,7 @@ class PostLikeController extends Controller
     }
 
     //give like
-    public function store(LikeCreateRequest $request){
+    public function store(Request $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
@@ -53,7 +52,7 @@ class PostLikeController extends Controller
     }
 
     //ungive like
-    public function destroy(LikeDeleteRequest $request){
+    public function destroy(Request $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){

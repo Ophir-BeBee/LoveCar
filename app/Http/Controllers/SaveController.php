@@ -67,7 +67,7 @@ class SaveController extends Controller
     }
 
     //delete save post
-    public function destroy(SaveDeleteRequest $request){
+    public function destroy(Request $request){
         //check saved or not
         $save = $this->model->find($request->save_id);
         if(!$save){

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\CommentCreateRequest;
 use App\Http\Requests\CommentDeleteRequest;
+use App\Http\Requests\CommentUpdateRequest;
 
 class CommentController extends Controller
 {
@@ -42,15 +43,9 @@ class CommentController extends Controller
     }
 
     //delete comment
-    public function destroy(CommentDeleteRequest $request){
-        //check comment
+    public function destroy(Request $request){
+        //get comment
         $comment = $this->model->find($request->comment_id);
-        if(!$comment){
-            return response()->json([
-                'message' => 'Comment not found',
-                'status' => 404
-            ]);
-        }
 
         //user authorization
         if(Gate::denies('auth-comment', $comment)){
@@ -63,6 +58,30 @@ class CommentController extends Controller
         $comment->delete();
         return response()->json([
             'message' => 'You deleted this comment',
+            'status' => 200
+        ]);
+    }
+
+    //update comment
+    public function update(CommentUpdateRequest $request){
+        //get comment
+        $comment = $this->model->find($request->comment_id);
+
+        //check comment
+        if(!$comment){
+            return response()->json([
+                'message' => 'Comment not found',
+                'status' => 404
+            ]);
+        }
+
+        //update comment
+        $comment = $comment->update([
+            'text' => $request->text
+        ]);
+        return response()->json([
+            'comment' => $comment,
+            'message' => 'Comment has been updated',
             'status' => 200
         ]);
     }

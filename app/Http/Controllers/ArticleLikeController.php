@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ThumbCreateRequest;
-use App\Http\Requests\ThumbDeleteRequest;
 use App\Models\ArticleLike;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ArticleLikeCreateRequest;
 
 class ArticleLikeController extends Controller
 {
@@ -19,7 +19,7 @@ class ArticleLikeController extends Controller
     }
 
     //give like
-    public function store(ThumbCreateRequest $request){
+    public function store(Request $request){
         //check article
         $article = Article::find($request->article_id);
         if(!$article){
@@ -39,19 +39,18 @@ class ArticleLikeController extends Controller
         }
 
         //create thumb
-        $data = $this->model->create([
+        $this->model->create([
             'user_id' => Auth::user()->id,
             'article_id' => $request->article_id
         ]);
         return response()->json([
-            'data' => $data,
             'message' => 'You liked this article',
             'status' => 200
         ]);
     }
 
     //unlike article
-    public function destroy(ThumbDeleteRequest $request){
+    public function destroy(Request $request){
         //check article
         $article = Article::find($request->article_id);
         if(!$article){
