@@ -38,29 +38,29 @@ class PostController extends Controller
     }
 
     //post show
-    public function show($id){
-        //get post data
-        $post = $this->model
-        ->where('id',$id)
-        ->withCount('post_likes')
-        ->withCount('comments')
-        ->with(['comments' => function($query) {
-            $query->with('user:id,name');
-            $query->orderBy('id','desc');
-        }])
-        ->with('post_images')
-        ->first();
+    // public function show($id){
+    //     //get post data
+    //     $post = $this->model
+    //     ->where('id',$id)
+    //     ->withCount('post_likes')
+    //     ->withCount('comments')
+    //     ->with(['comments' => function($query) {
+    //         $query->with('user:id,name');
+    //         $query->orderBy('id','desc');
+    //     }])
+    //     ->with('post_images')
+    //     ->first();
 
-        //increase view
-        PostView::create([
-            'user_id' => Auth::user()->id,
-            'post_id' => $id
-        ]);
-        return response()->json([
-            'data' => $post,
-            'status' => 200
-        ]);
-    }
+    //     //increase view
+    //     PostView::create([
+    //         'user_id' => Auth::user()->id,
+    //         'post_id' => $id
+    //     ]);
+    //     return response()->json([
+    //         'data' => $post,
+    //         'status' => 200
+    //     ]);
+    // }
 
     //create posts
     public function store(PostRequest $request){

@@ -24,7 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
         //posts
         Route::get('/','index');
         Route::post('/','store');
-        Route::get('/{id}','show');
         Route::post('/update','update');
         Route::delete('/','destroy');
 
@@ -38,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::group(["prefix" => "comments", "controller" => CommentController::class],function(){
             Route::post('/','store');
             Route::post('/update','update');
+            Route::get('/{post_id}','show');
             Route::delete('/','destroy');
         });
 

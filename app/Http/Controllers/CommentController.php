@@ -87,6 +87,13 @@ class CommentController extends Controller
         ]);
     }
 
+    public function show($post_id){
+        return response()->json([
+            'data' => $this->model->where('post_id',$post_id)->with('user:id,name')->get(),
+            'status' => 200
+        ]);
+    }
+
     //change comment create data to array
     private function changeCreateCommentDataToArray($request){
         return [
