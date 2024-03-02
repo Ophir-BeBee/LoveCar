@@ -7,8 +7,6 @@ use App\Models\Save;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use App\Http\Requests\SaveCreateRequest;
-use App\Http\Requests\SaveDeleteRequest;
 
 class SaveController extends Controller
 {
