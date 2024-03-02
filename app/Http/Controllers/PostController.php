@@ -75,6 +75,7 @@ class PostController extends Controller
                 $query->with('user:id,name');
                 $query->orderBy('id','desc');
             }])
+            ->with('post_images')
             ->first();
         return sendResponse($data,200);
     }
