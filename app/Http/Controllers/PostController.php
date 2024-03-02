@@ -29,6 +29,9 @@ class PostController extends Controller
         ->withCount(['post_likes as is_liked' => function($query){
             $query->where('post_likes.user_id',Auth::user()->id);
         }])
+        ->withCount(['saves as is_saved' => function($query){
+            $query->where('saves.user_id',Auth::user()->id);
+        }])
         ->withCount('comments')
         ->orderBy('id','desc')
         ->get();
@@ -74,6 +77,9 @@ class PostController extends Controller
             ->with(['comments' => function($query) {
                 $query->with('user:id,name');
                 $query->orderBy('id','desc');
+            }])
+            ->withCount(['saves as is_saved' => function($query){
+                $query->where('saves.user_id',Auth::user()->id);
             }])
             ->with('post_images')
             ->first();
@@ -145,6 +151,9 @@ class PostController extends Controller
         ->with(['comments' => function($query) {
             $query->with('user:id,name');
             $query->orderBy('id','desc');
+        }])
+        ->withCount(['saves as is_saved' => function($query){
+            $query->where('saves.user_id',Auth::user()->id);
         }])
         ->first();
         return sendResponse($data,200);
