@@ -29,59 +29,52 @@ class ShopController extends Controller
 
     //get all shops
     public function index(){
-        return response()->json([
-            'data' => $this->model
-            ->with(['shop_to_categories' => function($query){
-                $query->select('id','shop_id','shop_category_id');
-                $query->with('shop_category:id,name');
-            }])
-            ->with(['shop_to_services' => function($query){
-                $query->select('id','shop_id','shop_service_id');
-                $query->with(['shop_service' => function($query){
-                    $query->select('id','name');
-                    $query->with(['shop_service_items' => function($query){
-                        $query->select('id','shop_id','shop_service_id','name');
-                    }]);
+        $data = $this->model
+        ->with(['shop_to_categories' => function($query){
+            $query->select('id','shop_id','shop_category_id');
+            $query->with('shop_category:id,name');
+        }])
+        ->with(['shop_to_services' => function($query){
+            $query->select('id','shop_id','shop_service_id');
+            $query->with(['shop_service' => function($query){
+                $query->select('id','name');
+                $query->with(['shop_service_items' => function($query){
+                    $query->select('id','shop_id','shop_service_id','name');
                 }]);
-            }])
-            ->with('shop_images:id,shop_id,name')
-            ->get(),
-            'status' => 200
-        ]);
+            }]);
+        }])
+        ->with('shop_images:id,shop_id,name')
+        ->get();
+        return sendResponse($data,200);
     }
 
     //shop show
     public function show($id){
-        return response()->json([
-            'data' => $this->model
-            ->where('id',$id)
-            ->with(['shop_to_categories' => function($query){
-                $query->select('id','shop_id','shop_category_id');
-                $query->with('shop_category:id,name');
-            }])
-            ->with(['shop_to_services' => function($query){
-                $query->select('id','shop_id','shop_service_id');
-                $query->with(['shop_service' => function($query){
-                    $query->select('id','name');
-                    $query->with(['shop_service_items' => function($query){
-                        $query->select('id','shop_id','shop_service_id','name');
-                    }]);
+        $data = $this->model
+        ->where('id',$id)
+        ->with(['shop_to_categories' => function($query){
+            $query->select('id','shop_id','shop_category_id');
+            $query->with('shop_category:id,name');
+        }])
+        ->with(['shop_to_services' => function($query){
+            $query->select('id','shop_id','shop_service_id');
+            $query->with(['shop_service' => function($query){
+                $query->select('id','name');
+                $query->with(['shop_service_items' => function($query){
+                    $query->select('id','shop_id','shop_service_id','name');
                 }]);
-            }])
-            ->with('shop_images:id,shop_id,name')
-            ->first(),
-            'status' => 200
-        ]);
+            }]);
+        }])
+        ->with('shop_images:id,shop_id,name')
+        ->first();
+        return sendResponse($data,200);
     }
 
     //create shops
     public function store(ShopRequest $request){
         //user authorization
         if(Gate::denies('auth-shop')){
-            return response()->json([
-                'message' => "Not allowed",
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         //assign array data
@@ -141,10 +134,7 @@ class ShopController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>5){
-                return response()->json([
-                    'message' => "Can't upload more than 5 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 5 photos");
             }
 
             //store images
@@ -158,46 +148,36 @@ class ShopController extends Controller
             }
         }
 
-        return response()->json([
-            'data' => $this->model
-            ->where('id',$shop->id)
-            ->with(['shop_to_categories' => function($query){
-                $query->select('id','shop_id','shop_category_id');
-                $query->with('shop_category:id,name');
-            }])
-            ->with(['shop_to_services' => function($query){
-                $query->select('id','shop_id','shop_service_id');
-                $query->with(['shop_service' => function($query){
-                    $query->select('id','name');
-                    $query->with(['shop_service_items' => function($query){
-                        $query->select('id','shop_id','shop_service_id','name');
-                    }]);
+        $data = $this->model
+        ->where('id',$shop->id)
+        ->with(['shop_to_categories' => function($query){
+            $query->select('id','shop_id','shop_category_id');
+            $query->with('shop_category:id,name');
+        }])
+        ->with(['shop_to_services' => function($query){
+            $query->select('id','shop_id','shop_service_id');
+            $query->with(['shop_service' => function($query){
+                $query->select('id','name');
+                $query->with(['shop_service_items' => function($query){
+                    $query->select('id','shop_id','shop_service_id','name');
                 }]);
-            }])
-            ->with('shop_images:id,shop_id,name')
-            ->first(),
-            'message' => 'Shop Creation success',
-            'status' => 200
-        ]);
-
+            }]);
+        }])
+        ->with('shop_images:id,shop_id,name')
+        ->first();
+        return sendResponse($data,200);
     }
 
     //update shop
     public function update(ShopRequest $request){
         //user authorization
         if(Gate::denies('auth-shop')){
-            return response()->json([
-                'message' => "Not allowed",
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $shop = $this->model->find($request->shop_id);
         if(!$shop){
-            return response()->json([
-                'message' => 'Shop not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Shop not found');
         }
 
         //logo check and delete
@@ -275,10 +255,7 @@ class ShopController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>5){
-                return response()->json([
-                    'message' => "Can't upload more than 5 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 5 photos");
             }
 
             //store images
@@ -291,35 +268,30 @@ class ShopController extends Controller
                 ]);
             }
         }
-        return response()->json([
-            'data' => $this->model
-            ->where('id',$shop->id)
-            ->with(['shop_to_categories' => function($query){
-                $query->select('id','shop_id','shop_category_id');
-                $query->with('shop_category:id,name');
-            }])
-            ->with(['shop_to_services' => function($query){
-                $query->select('id','shop_id','shop_service_id');
-                $query->with(['shop_service' => function($query){
-                    $query->select('id','name');
-                    $query->with('shop_service_items:id,shop_id,shop_service_id,name');
-                }]);
-            }])
-            ->with('shop_images:id,shop_id,name')
-            ->first(),
-            'message' => 'Post has been updated',
-            'status' => 200
-        ]);
+
+        $data = $this->model
+        ->where('id',$shop->id)
+        ->with(['shop_to_categories' => function($query){
+            $query->select('id','shop_id','shop_category_id');
+            $query->with('shop_category:id,name');
+        }])
+        ->with(['shop_to_services' => function($query){
+            $query->select('id','shop_id','shop_service_id');
+            $query->with(['shop_service' => function($query){
+                $query->select('id','name');
+                $query->with('shop_service_items:id,shop_id,shop_service_id,name');
+            }]);
+        }])
+        ->with('shop_images:id,shop_id,name')
+        ->first();
+        return sendResponse($data,200,'Shop has been updated');
     }
 
     //delete shop
     public function destroy(Request $request){
         //user authorization
         if(Gate::denies('auth-shop')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         //image manual delete
@@ -337,11 +309,7 @@ class ShopController extends Controller
 
         //delete shop
         $shop->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'Shop has been deleted',
-            'status' => 200
-        ]);
+        return sendResponse(null,200,'Shop has been deleted');
     }
 
     //change shop update data to array

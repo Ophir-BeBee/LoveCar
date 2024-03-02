@@ -25,6 +25,13 @@ class DatabaseSeeder extends Seeder
             'type' => 'admin'
         ]);
 
+        \App\Models\User::create([
+            'name' => 'Thit Lwin',
+            'email' => 'thitlwin@gmail.com',
+            'password' => Hash::make('128'),
+            'type' => 'admin'
+        ]);
+
         ShopCategory::create([
             'name' => 'Accessories'
         ]);

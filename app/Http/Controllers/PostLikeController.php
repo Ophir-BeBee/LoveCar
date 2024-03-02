@@ -17,58 +17,50 @@ class PostLikeController extends Controller
         $this->model  = $model;
     }
 
-    //give like
-    public function store(Request $request){
+    //toggle like
+    public function toggle(Request $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Post not found');
         }
 
         //check liked or not
         $check = $this->model->where('post_id',$request->post_id)->where('user_id',Auth::user()->id)->first();
         if($check){
-            return response()->json([
-                'message' => 'You already liked this post',
-                'status' => 405
-            ]);
+            //delete like
+            $this->model->where('post_id',$request->post_id)->where('user_id',Auth::user()->id)->delete();
+            //get post data to return
+            $data = Post::where('id',$request->post_id)
+            ->select('id')
+            ->withCount('post_likes')
+            ->withCount(['post_likes as is_liked' => function($query){
+                $query->where('post_likes.user_id',Auth::user()->id);
+            }])
+            ->withCount('comments')
+            ->first();
+            return sendResponse($data,200,'You unliked this post');
         }
 
-        //create like
-        $data = $this->model->create([
+         //create like
+         $data = $this->model->create([
             'user_id' => Auth::user()->id,
             'post_id' => $request->post_id
         ]);
 
-        return response()->json([
-            'data' => $data,
-            'message' => 'You liked this post',
-            'status' => 200
-        ]);
-
-    }
-
-    //ungive like
-    public function destroy(Request $request){
-        //check post
-        $post = Post::find($request->post_id);
-        if(!$post){
-            return response()->json([
-                'message'=> 'Post not found',
-                'status' => 404
-            ]);
-        }
-
-        //delete like
-        $this->model->where('post_id',$request->post_id)->where('user_id',Auth::user()->id)->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'You unliked this post',
-            'status' => 200
-        ]);
+        $data = $this->model
+        ->where('post_id',$request->post_id)
+        ->select('id','post_id')
+        ->with(['post' => function($query){
+            $query->select('id')
+            ->withCount('post_likes')
+            ->withCount('comments')
+            ->withCount(['post_likes as is_liked' => function($query){
+                $query->where('post_likes.user_id',Auth::user()->id);
+            }]);
+        }])
+        ->first();
+        return sendResponse($data->post,200,'You liked this post');
     }
 
 }

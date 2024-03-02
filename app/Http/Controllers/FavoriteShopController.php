@@ -20,17 +20,12 @@ class FavoriteShopController extends Controller
     //index
     public function index(){
         $data = $this->model->with('shop:id,name,logo,address')->get();
+
         if(count($data)==0){
-            return response()->json([
-                'data' => null,
-                'message' => 'You have no favorite shop',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'You have no favorite shop');
         }
-        return response()->json([
-            'data' => $data,
-            'status' => 200
-        ]);
+
+        return sendResponse($data,200);
     }
 
     //create favorite shop
@@ -38,19 +33,13 @@ class FavoriteShopController extends Controller
         //check shop exist
         $shop = Shop::find($request->shop_id);
         if(!$shop){
-            return response()->json([
-                'message' => 'Shop not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Shop not found');
         }
 
         //check favorite shop
         $favoriteShop = $this->model->where('shop_id',$request->shop_id)->first();
         if($favoriteShop){
-            return response()->json([
-                'message' => 'You already added this shop to favorites',
-                'status' => 405
-            ]);
+            return sendResponse(null,405,'You already added this shop to favorites');
         }
 
         //create favorite
@@ -58,14 +47,8 @@ class FavoriteShopController extends Controller
             'user_id' => Auth::user()->id,
             'shop_id' => $request->shop_id
         ]);
-        return response()->json([
-            'data' => $this->model
-                    ->where('id',$favoriteShop->id)
-                    ->with('shop:id,name,logo,address')
-                    ->first(),
-            'message' => 'You added this shop to favorites',
-            'status' => 200
-        ]);
+        $data = $this->model->where('id',$favoriteShop->id)->with('shop:id,name,logo,address')->first();
+        return sendResponse($data,200,'You added this shop to favorites');
     }
 
     //delete favorite shop
@@ -73,26 +56,16 @@ class FavoriteShopController extends Controller
         //check shop
         $shop = Shop::find($request->shop_id);
         if(!$shop){
-            return response()->json([
-                'message' => 'Shop not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Shop not found');
         }
 
         //check favorite shop
         $favoriteShop = $this->model->where('shop_id',$request->shop_id)->first();
         if(!$favoriteShop){
-            return response()->json([
-                'message' => 'You already removed this shop from favorites',
-                'status' => 405
-            ]);
+            return sendResponse(null,405,'You already removed this shop from favorties');
         }
 
         $favoriteShop->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'You removed this shop from favorites',
-            'status' => 200
-        ]);
+        return sendResponse(null,200,'You removed this shop from favorites');
     }
 }

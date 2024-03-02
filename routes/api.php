@@ -24,13 +24,13 @@ Route::middleware('auth:sanctum')->group(function () {
         //posts
         Route::get('/','index');
         Route::post('/','store');
+        Route::post('/view','view');
         Route::post('/update','update');
         Route::delete('/','destroy');
 
         //likes
         Route::group(["prefix" => "likes", "controller" => PostLikeController::class],function(){
-            Route::post('/','store');
-            Route::delete('/','destroy');
+            Route::post('/','toggle');
         });
 
         //comments
@@ -54,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //articles
         Route::get('/','index');
         Route::post('/','store');
-        Route::get('/{id}','show');
+        Route::post('/view','view');
         Route::post('/update','update');
         Route::delete('/','destroy');
 

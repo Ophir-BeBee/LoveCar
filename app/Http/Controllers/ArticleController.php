@@ -27,40 +27,38 @@ class ArticleController extends Controller
 
     //get all articles
     public function index(){
-        return response()->json([
-            'data' => $this->model->withCount('article_likes')->orderBy('id','desc')->get(),
-            'status' => 200
-        ]);
+        $data = $this->model
+        ->withCount('article_likes')
+        ->withCount(['article_likes as is_liked' => function($query){
+            $query->where('article_likes.user_id',Auth::user()->id);
+        }])
+        ->with('article_images')
+        ->orderBy('id','desc')->get();
+        return sendResponse($data,200);
     }
 
     //article show
-    public function show($id){
-        //get article data
-        $article = $this->model
-        ->where('id',$id)
-        ->withCount('article_likes')
-        ->first();
+    // public function show($id){
+    //     //get article data
+    //     $article = $this->model
+    //     ->where('id',$id)
+    //     ->withCount('article_likes')
+    //     ->first();
 
-        //increase view
-        ArticleView::create([
-            'user_id' => Auth::user()->id,
-            'article_id' => $id
-        ]);
+    //     //increase view
+    //     ArticleView::create([
+    //         'user_id' => Auth::user()->id,
+    //         'article_id' => $id
+    //     ]);
 
-        return response()->json([
-            'data' => $article,
-            'status' => 200
-        ]);
-    }
+    //     return sendResponse($article,200);
+    // }
 
     //create article
     public function store(ArticleRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,"Not allowed");
         }
 
         //create data or article
@@ -75,10 +73,7 @@ class ArticleController extends Controller
             //four photos validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //store photos
@@ -91,15 +86,17 @@ class ArticleController extends Controller
                 ]);
             }
         }
+        $data = $article->where('id',$article->id)->withCount('article_likes')->first();
+        return sendResponse($data,200,'Article has been created');
+    }
 
-        return response()->json([
-            'data' => $article
-            ->where('id',$article->id)
-            ->withCount('article_likes')
-            ->first(),
-            'message' => 'Article has been created',
-            'status' => 200
+    //view article
+    public function view(Request $request){
+        ArticleView::create([
+            'user_id' => Auth::user()->id,
+            'article_id' => $request->article_id
         ]);
+        return sendResponse(null,200,'You viewed this article');
     }
 
     //update article
@@ -107,19 +104,13 @@ class ArticleController extends Controller
 
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $article = $this->model->find($request->article_id);
 
         if(!$article){
-            return response()->json([
-                'message' => 'Article not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Article not found');
         }
 
         //update data
@@ -142,10 +133,7 @@ class ArticleController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //update images
@@ -160,15 +148,8 @@ class ArticleController extends Controller
 
         }
 
-        return response()->json([
-            'data' => $this->model
-            ->where('id',$request->id)
-            ->withCount('article_likes')
-            ->first(),
-            'message' => 'Article has beeen updated',
-            'status' => 200
-        ]);
-
+        $data = $this->model->where('id',$request->id)->withCount('article_likes')->first();
+        return sendResponse($data,200,'Article has beeen updated');
     }
 
         //delete posts
@@ -176,10 +157,7 @@ class ArticleController extends Controller
 
             // user authorization
             if(Gate::denies('auth-post')){
-                return response()->json([
-                    'message' => 'Not allowed',
-                    'status' => 401
-                ]);
+                return sendResponse(null,401,'Not allowed');
             }
 
             //image manual delete
@@ -190,11 +168,7 @@ class ArticleController extends Controller
             }
 
             $this->model->find($request->article_id)->delete();
-            return response()->json([
-                'data' => null,
-                'message' => 'Article has been deleted',
-                'status' => 200
-            ]);
+            return sendResponse(null,200,'Article has beeen deleted');
         }
 
     //change article data to array

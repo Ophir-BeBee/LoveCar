@@ -27,20 +27,14 @@ class CommentController extends Controller
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Post not found');
         }
 
         //create comment
         $data = $this->changeCreateCommentDataToArray($request);
         $comment = $this->model->create($data);
-        return response()->json([
-            'data' => $comment,
-            'message' => "You've commented on this post",
-            'status' => 200
-        ]);
+        $data = $this->find($comment->id)->with('user:id,name');
+        return sendResponse($data,200,"You've commented on this post");
     }
 
     //delete comment
@@ -50,17 +44,11 @@ class CommentController extends Controller
 
         //user authorization
         if(Gate::denies('auth-comment', $comment)){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $comment->delete();
-        return response()->json([
-            'message' => 'You deleted this comment',
-            'status' => 200
-        ]);
+        return sendResponse(null,200,'You deleted this comment');
     }
 
     //update comment
@@ -70,28 +58,21 @@ class CommentController extends Controller
 
         //check comment
         if(!$comment){
-            return response()->json([
-                'message' => 'Comment not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Comment not found');
         }
 
         //update comment
         $comment = $comment->update([
             'text' => $request->text
         ]);
-        return response()->json([
-            'data' => $comment,
-            'message' => 'Comment has been updated',
-            'status' => 200
-        ]);
+        $data = $this->find($comment->id)->with('user:id,name');
+        return sendResponse($data,200,'Comment has been updated');
     }
 
+    //show comment
     public function show($post_id){
-        return response()->json([
-            'data' => $this->model->where('post_id',$post_id)->with('user:id,name')->get(),
-            'status' => 200
-        ]);
+        $data = $this->model->where('post_id',$post_id)->with('user:id,name')->get();
+        return sendResponse($data,200);
     }
 
     //change comment create data to array

@@ -7,6 +7,7 @@ use App\Models\PostView;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -26,50 +27,23 @@ class PostController extends Controller
 
     //get all posts
     public function index(){
-        return response()->json([
-            'data' => $this->model
-            ->with('post_images')
-            ->withCount('post_likes')
-            ->withCount('comments')
-            ->orderBy('id','desc')
-            ->get(),
-            'status' => 200
-        ]);
+        $data = $this->model
+        ->with('post_images')
+        ->withCount('post_likes')
+        ->withCount(['post_likes as is_liked' => function($query){
+            $query->where('post_likes.user_id',Auth::user()->id);
+        }])
+        ->withCount('comments')
+        ->orderBy('id','desc')
+        ->get();
+        return sendResponse($data,200);
     }
-
-    //post show
-    // public function show($id){
-    //     //get post data
-    //     $post = $this->model
-    //     ->where('id',$id)
-    //     ->withCount('post_likes')
-    //     ->withCount('comments')
-    //     ->with(['comments' => function($query) {
-    //         $query->with('user:id,name');
-    //         $query->orderBy('id','desc');
-    //     }])
-    //     ->with('post_images')
-    //     ->first();
-
-    //     //increase view
-    //     PostView::create([
-    //         'user_id' => Auth::user()->id,
-    //         'post_id' => $id
-    //     ]);
-    //     return response()->json([
-    //         'data' => $post,
-    //         'status' => 200
-    //     ]);
-    // }
 
     //create posts
     public function store(PostRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         //create data of posts
@@ -84,10 +58,7 @@ class PostController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //store images
@@ -100,9 +71,7 @@ class PostController extends Controller
                 ]);
             }
         }
-
-        return response()->json([
-            'data' => $this->model
+        $data = $this->model
             ->where('id',$post->id)
             ->withCount('post_likes')
             ->withCount('comments')
@@ -110,10 +79,17 @@ class PostController extends Controller
                 $query->with('user:id,name');
                 $query->orderBy('id','desc');
             }])
-            ->first(),
-            'message' => 'Post has been created',
-            'status' => 200
+            ->first();
+        return sendResponse($data,200);
+    }
+
+    //view posts
+    public function view(Request $request){
+        PostView::create([
+            'user_id' => Auth::user()->id,
+            'post_id' => $request->post_id
         ]);
+        return sendResponse(null,200,'You viewed this post');
     }
 
     //update posts
@@ -121,19 +97,13 @@ class PostController extends Controller
 
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $post = $this->model->find($request->post_id);
 
         if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Post not found');
         }
 
         //update data
@@ -156,10 +126,7 @@ class PostController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //update images
@@ -174,20 +141,16 @@ class PostController extends Controller
 
         }
 
-        return response()->json([
-            'data' => $this->model
-            ->where('id',$post->id)
-            ->withCount('post_likes')
-            ->withCount('comments')
-            ->with(['comments' => function($query) {
-                $query->with('user:id,name');
-                $query->orderBy('id','desc');
-            }])
-            ->first(),
-            'message' => 'Post has beeen updated',
-            'status' => 200
-        ]);
-
+        $data = $this->model
+        ->where('id',$post->id)
+        ->withCount('post_likes')
+        ->withCount('comments')
+        ->with(['comments' => function($query) {
+            $query->with('user:id,name');
+            $query->orderBy('id','desc');
+        }])
+        ->first();
+        return sendResponse($data,200);
     }
 
     //delete posts
@@ -195,10 +158,7 @@ class PostController extends Controller
 
         // user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         //image manual delete
@@ -209,11 +169,7 @@ class PostController extends Controller
         }
 
         $this->model->find($request->post_id)->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'Post has been deleted',
-            'status' => 200
-        ]);
+        return sendResponse(null,200,'Post has been deleted');
     }
 
     //change post data to array
