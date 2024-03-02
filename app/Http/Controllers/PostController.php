@@ -7,6 +7,7 @@ use App\Models\PostView;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
+use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -35,7 +36,7 @@ class PostController extends Controller
         ->withCount('comments')
         ->orderBy('id','desc')
         ->get();
-        return sendResponse($data,200);
+        return sendResponse(PostResource::collection($data),200);
     }
 
     //create posts
@@ -83,7 +84,7 @@ class PostController extends Controller
             }])
             ->with('post_images')
             ->first();
-        return sendResponse($data,200);
+        return sendResponse(new PostResource($data),200);
     }
 
     //view posts
@@ -155,8 +156,9 @@ class PostController extends Controller
         ->withCount(['saves as is_saved' => function($query){
             $query->where('saves.user_id',Auth::user()->id);
         }])
+        ->with('post_images')
         ->first();
-        return sendResponse($data,200);
+        return sendResponse(new PostResource($data),200);
     }
 
     //delete posts

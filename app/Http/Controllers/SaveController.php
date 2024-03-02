@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SaveResource;
 use App\Models\Post;
 use App\Models\Save;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 
 class SaveController extends Controller
 {
@@ -20,51 +20,55 @@ class SaveController extends Controller
 
     //get save posts
     public function index(){
-        $saves = $this->model->with('post')->get();
+        $saves = $this->model
+        ->with(['post' => function($query){
+            $query->withCount(['saves as is_saved' => function($query){
+                $query->where('saves.user_id',Auth::user()->id);
+            }]);
+        }])
+        ->orderBy('id','desc')
+        ->get();
 
         if(count($saves) == 0){
             return sendResponse(null,404,'You have no save post');
         }
 
-        return sendResponse($saves,200);
+        return sendResponse(SaveResource::collection($saves),200);
     }
 
-    //save post
-    public function store(Request $request){
+    //toggle
+    public function toggle(Request $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
             return sendResponse(null,404,'Post not found');
         }
 
-        $savePost = $this->model->where('user_id',Auth::user()->id)->where('post_id')->first();
-        if($savePost){
-            return sendResponse(null,405,'You already saved this post');
+        //check saved or not
+        $save = $this->model
+        ->where('post_id',$request->post_id)
+        ->where('user_id',Auth::user()->id)
+        ->with('post')
+        ->first();
+
+        //check saved or not
+        if($save){
+            $save->post->is_saved = 0;
+            $saveData = $save;
+            $save->delete();
+            return sendResponse(new SaveResource($saveData),200,'You unsaved this post');
         }
 
         //create save
         $data = $this->changeCreateSaveDataToArray($request);
         $data = $this->model->create($data);
-        return sendResponse($data,200,'You saved this post');
+        $data = $this->model->where('id',$data->id)->with(['post' => function($query){
+            $query->select('id','title','description');
+            $query->with('post_images');
+        }])->first();
+        $data->post->is_saved = 1;
+        return sendResponse(new SaveResource($data),200,'You saved this post');
     }
-
-    //delete save post
-    public function destroy(Request $request){
-        //check saved or not
-        $save = $this->model->find($request->save_id);
-        if(!$save){
-            return sendResponse(null,405,'You already unsaved this post');
-        }
-
-        //user authorization
-        if(Gate::denies('auth-unsave',$save)){
-            return sendResponse(null,401,'Not allowed');
-        }
-
-        $save->delete();
-        return sendResponse(null,200,'You unsaved this post');
-    }
-
 
     //change create save data to array
     private function changeCreateSaveDataToArray($request){
