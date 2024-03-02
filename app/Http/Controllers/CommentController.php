@@ -68,7 +68,7 @@ class CommentController extends Controller
 
     //show comment
     public function show($post_id){
-        $data = $this->model->where('post_id',$post_id)->with('user:id,name')->first();
+        $data = $this->model->where('post_id',$post_id)->with('user:id,name')->orderBy('id','desc')->get();
         return sendResponse($data,200);
     }
 

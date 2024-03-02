@@ -6,7 +6,6 @@ use App\Models\Article;
 use App\Models\ArticleLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ArticleLikeCreateRequest;
 
 class ArticleLikeController extends Controller
 {

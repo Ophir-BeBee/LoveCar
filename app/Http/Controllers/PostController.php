@@ -7,13 +7,9 @@ use App\Models\PostView;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\PostCreateRequest;
-use App\Http\Requests\PostDeleteRequest;
-use App\Http\Requests\PostUpdateRequest;
 
 class PostController extends Controller
 {
