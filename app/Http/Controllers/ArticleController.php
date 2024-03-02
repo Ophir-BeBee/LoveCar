@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\Article;
+use App\Models\ArticleView;
+use App\Models\ArticleImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\ArticleRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ArticleUpateRequest;
 use App\Http\Requests\ArticleCreateRequest;
 use App\Http\Requests\ArticleDeleteRequest;
-use App\Models\ArticleImage;
-use App\Models\ArticleView;
 
 class ArticleController extends Controller
 {
@@ -26,40 +27,38 @@ class ArticleController extends Controller
 
     //get all articles
     public function index(){
-        return response()->json([
-            'articles' => $this->model->withCount('article_likes')->orderBy('id','desc')->get(),
-            'status' => 200
-        ]);
+        $data = $this->model
+        ->withCount('article_likes')
+        ->withCount(['article_likes as is_liked' => function($query){
+            $query->where('article_likes.user_id',Auth::user()->id);
+        }])
+        ->with('article_images')
+        ->orderBy('id','desc')->get();
+        return sendResponse($data,200);
     }
 
     //article show
-    public function show(Request $request){
-        //get article data
-        $article = $this->model
-        ->where('id',$request->id)
-        ->withCount('article_likes')
-        ->first();
+    // public function show($id){
+    //     //get article data
+    //     $article = $this->model
+    //     ->where('id',$id)
+    //     ->withCount('article_likes')
+    //     ->first();
 
-        //increase view
-        ArticleView::create([
-            'user_id' => Auth::user()->id,
-            'article_id' => $request->id
-        ]);
+    //     //increase view
+    //     ArticleView::create([
+    //         'user_id' => Auth::user()->id,
+    //         'article_id' => $id
+    //     ]);
 
-        return response()->json([
-            'article' => $article,
-            'status' => 200
-        ]);
-    }
+    //     return sendResponse($article,200);
+    // }
 
     //create article
-    public function store(ArticleCreateRequest $request){
+    public function store(ArticleRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,"Not allowed");
         }
 
         //create data or article
@@ -67,7 +66,6 @@ class ArticleController extends Controller
         $article = $this->model->create($data);
 
         //check photos inclued or not
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -75,49 +73,44 @@ class ArticleController extends Controller
             //four photos validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //store photos
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,ArticleImage::create([
+                ArticleImage::create([
                     'article_id' => $article->id,
                     'name' => $imageName
-                ]));
+                ]);
             }
         }
+        $data = $article->where('id',$article->id)->withCount('article_likes')->first();
+        return sendResponse($data,200,'Article has been created');
+    }
 
-        return response()->json([
-            'article' => $article,
-            'images' => $images,
-            'message' => 'Article has been created',
-            'status' => 200
+    //view article
+    public function view(Request $request){
+        ArticleView::create([
+            'user_id' => Auth::user()->id,
+            'article_id' => $request->article_id
         ]);
+        return sendResponse(null,200,'You viewed this article');
     }
 
     //update article
-    public function update(ArticleUpateRequest $request){
+    public function update(ArticleRequest $request){
 
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $article = $this->model->find($request->article_id);
 
         if(!$article){
-            return response()->json([
-                'message' => 'Article not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Article not found');
         }
 
         //update data
@@ -133,7 +126,6 @@ class ArticleController extends Controller
         }
 
         //update new images
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -141,52 +133,31 @@ class ArticleController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //update images
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,ArticleImage::create([
+                ArticleImage::create([
                     'article_id' => $request->article_id,
                     'name' => $imageName
-                ]));
+                ]);
             }
 
         }
 
-        return response()->json([
-            'article' => $article,
-            'images' => $images,
-            'message' => 'Article has beeen updated',
-            'status' => 200
-        ]);
-
+        $data = $this->model->where('id',$request->id)->withCount('article_likes')->first();
+        return sendResponse($data,200,'Article has beeen updated');
     }
 
         //delete posts
-        public function destroy(ArticleDeleteRequest $request){
+        public function destroy(Request $request){
 
             // user authorization
             if(Gate::denies('auth-post')){
-                return response()->json([
-                    'message' => 'Not allowed',
-                    'status' => 401
-                ]);
-            }
-
-            //get post first
-            $article = $this->model->find($request->article_id);
-
-            if(!$article){
-                return response()->json([
-                    'message' => 'Article not found',
-                    'status' => 404
-                ]);
+                return sendResponse(null,401,'Not allowed');
             }
 
             //image manual delete
@@ -196,12 +167,8 @@ class ArticleController extends Controller
                 $image->delete();
             }
 
-            $article->delete();
-            return response()->json([
-                'data' => null,
-                'message' => 'Article has been deleted',
-                'status' => 200
-            ]);
+            $this->model->find($request->article_id)->delete();
+            return sendResponse(null,200,'Article has beeen deleted');
         }
 
     //change article data to array

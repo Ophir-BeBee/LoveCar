@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostView;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
+use App\Http\Requests\PostRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\PostCreateRequest;
 use App\Http\Requests\PostDeleteRequest;
 use App\Http\Requests\PostUpdateRequest;
-use App\Models\PostView;
 
 class PostController extends Controller
 {
@@ -25,50 +27,23 @@ class PostController extends Controller
 
     //get all posts
     public function index(){
-        return response()->json([
-            'data' => $this->model
-            ->with('user:id,name')
-            ->with('post_images')
-            ->withCount('post_likes')
-            ->withCount('comments')
-            ->orderBy('id','desc')
-            ->get(),
-            'status' => 200
-        ]);
-    }
-
-    //post show
-    public function show(Request $request){
-        //get post data
-        $post = $this->model
-        ->where('id',$request->id)
+        $data = $this->model
+        ->with('post_images')
         ->withCount('post_likes')
-        ->withCount('comments')
-        ->with(['comments' => function($query) {
-            $query->with('user:id,name');
-            $query->orderBy('id','desc');
+        ->withCount(['post_likes as is_liked' => function($query){
+            $query->where('post_likes.user_id',Auth::user()->id);
         }])
-        ->first();
-
-        //increase view
-        PostView::create([
-            'user_id' => Auth::user()->id,
-            'post_id' => $request->id
-        ]);
-        return response()->json([
-            'post' => $post,
-            'status' => 200
-        ]);
+        ->withCount('comments')
+        ->orderBy('id','desc')
+        ->get();
+        return sendResponse($data,200);
     }
 
     //create posts
-    public function store(PostCreateRequest $request){
+    public function store(PostRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         //create data of posts
@@ -76,7 +51,6 @@ class PostController extends Controller
         $post = $this->model->create($data);
 
         //check photos inclued or not
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -84,49 +58,52 @@ class PostController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //store images
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,PostImage::create([
+                PostImage::create([
                     'post_id' => $post->id,
                     'name' => $imageName
-                ]));
+                ]);
             }
         }
+        $data = $this->model
+            ->where('id',$post->id)
+            ->withCount('post_likes')
+            ->withCount('comments')
+            ->with(['comments' => function($query) {
+                $query->with('user:id,name');
+                $query->orderBy('id','desc');
+            }])
+            ->first();
+        return sendResponse($data,200);
+    }
 
-        return response()->json([
-            'post' => $post,
-            'images' => $images,
-            'message' => 'Post has been created',
-            'status' => 200
+    //view posts
+    public function view(Request $request){
+        PostView::create([
+            'user_id' => Auth::user()->id,
+            'post_id' => $request->post_id
         ]);
+        return sendResponse(null,200,'You viewed this post');
     }
 
     //update posts
-    public function update(PostUpdateRequest $request){
+    public function update(PostRequest $request){
 
         //user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $post = $this->model->find($request->post_id);
 
         if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Post not found');
         }
 
         //update data
@@ -142,7 +119,6 @@ class PostController extends Controller
         }
 
         //update new images
-        $images = array();
         if($request->file('image')){
 
             $imageFile = $request->file('image');
@@ -150,52 +126,39 @@ class PostController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return response()->json([
-                    'message' => "Can't upload more than 4 photos",
-                    'status' => 405
-                ]);
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //update images
             for($i=0;$i<$imageCount;$i++){
                 $imageName = uniqid() . '_' . time() . '.' . $imageFile[$i]->getClientOriginalExtension();
                 $imageFile[$i]->storeAs('public',$imageName);
-                array_push($images,PostImage::create([
+                PostImage::create([
                     'post_id' => $request->post_id,
                     'name' => $imageName
-                ]));
+                ]);
             }
 
         }
 
-        return response()->json([
-            'post' => $post,
-            'images' => $images,
-            'message' => 'Post has beeen updated',
-            'status' => 200
-        ]);
-
+        $data = $this->model
+        ->where('id',$post->id)
+        ->withCount('post_likes')
+        ->withCount('comments')
+        ->with(['comments' => function($query) {
+            $query->with('user:id,name');
+            $query->orderBy('id','desc');
+        }])
+        ->first();
+        return sendResponse($data,200);
     }
 
     //delete posts
-    public function destroy(PostDeleteRequest $request){
+    public function destroy(Request $request){
 
         // user authorization
         if(Gate::denies('auth-post')){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
-        }
-
-        //get post first
-        $post = $this->model->find($request->post_id);
-
-        if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         //image manual delete
@@ -205,12 +168,8 @@ class PostController extends Controller
             $image->delete();
         }
 
-        $post->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'Post has been deleted',
-            'status' => 200
-        ]);
+        $this->model->find($request->post_id)->delete();
+        return sendResponse(null,200,'Post has been deleted');
     }
 
     //change post data to array

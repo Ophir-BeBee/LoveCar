@@ -80,4 +80,9 @@ class User extends Authenticatable
     public function shops(){
         return $this->hasMany(Shop::class);
     }
+
+    //connect with favorite shops
+    public function favorite_shops(){
+        return $this->hasMany(FavoriteShop::class);
+    }
 }

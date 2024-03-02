@@ -25,72 +25,46 @@ class SaveController extends Controller
         $saves = $this->model->with('post')->get();
 
         if(count($saves) == 0){
-            return response()->json([
-                'message' => 'You have no save post',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'You have no save post');
         }
 
-        return response()->json([
-            'data' => $saves,
-            'status' => 200
-        ]);
+        return sendResponse($saves,200);
     }
 
     //save post
-    public function store(SaveCreateRequest $request){
+    public function store(Request $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Post not found');
         }
 
         $savePost = $this->model->where('user_id',Auth::user()->id)->where('post_id')->first();
         if($savePost){
-            return response()->json([
-                'message' => 'You already saved this post',
-                'status' => 405
-            ]);
+            return sendResponse(null,405,'You already saved this post');
         }
 
         //create save
         $data = $this->changeCreateSaveDataToArray($request);
         $data = $this->model->create($data);
-        return response()->json([
-            'data' => $data,
-            'message' => 'You saved this post',
-            'status' => 200
-        ]);
+        return sendResponse($data,200,'You saved this post');
     }
 
     //delete save post
-    public function destroy(SaveDeleteRequest $request){
+    public function destroy(Request $request){
         //check saved or not
         $save = $this->model->find($request->save_id);
         if(!$save){
-            return response()->json([
-                'message' => 'You already unsaved this post',
-                'status' => 405
-            ]);
+            return sendResponse(null,405,'You already unsaved this post');
         }
 
         //user authorization
         if(Gate::denies('auth-unsave',$save)){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $save->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'You unsaved this post',
-            'status' => 200
-        ]);
+        return sendResponse(null,200,'You unsaved this post');
     }
 
 

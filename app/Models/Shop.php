@@ -26,8 +26,16 @@ class Shop extends Model
         return $this->hasMany(ShopToService::class);
     }
 
+    public function shop_service_items(){
+        return $this->hasMany(ShopService::class);
+    }
+
     //connect with images
     public function shop_images(){
         return $this->hasMany(ShopImage::class);
+    }
+
+    public function favorite_shops(){
+        return $this->hasMany(FavoriteShop::class);
     }
 }

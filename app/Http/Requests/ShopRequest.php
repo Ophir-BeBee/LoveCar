@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ThumbDeleteRequest extends FormRequest
+class ShopRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class ThumbDeleteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'shop_categories' => 'required',
+            'name' => ['required','string'],
+            'phone' => ['required','string'],
+            'address' => ['required','string'],
+            'latitude' => ['required'],
+            'longitude' => ['required'],
+            'shop_services' => ['required']
         ];
     }
 }

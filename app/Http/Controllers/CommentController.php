@@ -7,8 +7,10 @@ use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use App\Http\Requests\CommentRequest;
 use App\Http\Requests\CommentCreateRequest;
 use App\Http\Requests\CommentDeleteRequest;
+use App\Http\Requests\CommentUpdateRequest;
 
 class CommentController extends Controller
 {
@@ -21,50 +23,56 @@ class CommentController extends Controller
     }
 
     //create comment
-    public function store(CommentCreateRequest $request){
+    public function store(CommentRequest $request){
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return response()->json([
-                'message' => 'Post not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Post not found');
         }
 
         //create comment
         $data = $this->changeCreateCommentDataToArray($request);
         $comment = $this->model->create($data);
-        return response()->json([
-            'comment' => $comment,
-            'message' => "You've commented on this post",
-            'status' => 200
-        ]);
+        $data = $this->find($comment->id)->with('user:id,name');
+        return sendResponse($data,200,"You've commented on this post");
     }
 
     //delete comment
-    public function destroy(CommentDeleteRequest $request){
-        //check comment
+    public function destroy(Request $request){
+        //get comment
         $comment = $this->model->find($request->comment_id);
-        if(!$comment){
-            return response()->json([
-                'message' => 'Comment not found',
-                'status' => 404
-            ]);
-        }
 
         //user authorization
         if(Gate::denies('auth-comment', $comment)){
-            return response()->json([
-                'message' => 'Not allowed',
-                'status' => 401
-            ]);
+            return sendResponse(null,401,'Not allowed');
         }
 
         $comment->delete();
-        return response()->json([
-            'message' => 'You deleted this comment',
-            'status' => 200
+        return sendResponse(null,200,'You deleted this comment');
+    }
+
+    //update comment
+    public function update(CommentRequest $request){
+        //get comment
+        $comment = $this->model->find($request->comment_id);
+
+        //check comment
+        if(!$comment){
+            return sendResponse(null,404,'Comment not found');
+        }
+
+        //update comment
+        $comment = $comment->update([
+            'text' => $request->text
         ]);
+        $data = $this->find($comment->id)->with('user:id,name');
+        return sendResponse($data,200,'Comment has been updated');
+    }
+
+    //show comment
+    public function show($post_id){
+        $data = $this->model->where('post_id',$post_id)->with('user:id,name')->get();
+        return sendResponse($data,200);
     }
 
     //change comment create data to array

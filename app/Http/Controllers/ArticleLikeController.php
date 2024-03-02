@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\ThumbCreateRequest;
-use App\Http\Requests\ThumbDeleteRequest;
 use App\Models\ArticleLike;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ArticleLikeCreateRequest;
 
 class ArticleLikeController extends Controller
 {
@@ -19,54 +19,37 @@ class ArticleLikeController extends Controller
     }
 
     //give like
-    public function store(ThumbCreateRequest $request){
+    public function store(Request $request){
         //check article
         $article = Article::find($request->article_id);
         if(!$article){
-            return response()->json([
-                'message' => 'Article not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Article not found');
         }
 
         //check liked or not
         $check = $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->first();
         if($check){
-            return response()->json([
-                'message' => 'You already liked this article',
-                'status' => 405
-            ]);
+            return sendResponse(null,405,'You already liked this article');
         }
 
-        //create thumb
+        //create like
         $data = $this->model->create([
             'user_id' => Auth::user()->id,
             'article_id' => $request->article_id
         ]);
-        return response()->json([
-            'data' => $data,
-            'message' => 'You liked this article',
-            'status' => 200
-        ]);
+        return sendResponse($data,200,'You liked this article');
     }
 
     //unlike article
-    public function destroy(ThumbDeleteRequest $request){
+    public function destroy(Request $request){
         //check article
         $article = Article::find($request->article_id);
         if(!$article){
-            return response()->json([
-                'message'=> 'Article not found',
-                'status' => 404
-            ]);
+            return sendResponse(null,404,'Article not found');
         }
 
         //delete like
         $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->delete();
-        return response()->json([
-            'data' => null,
-            'message' => 'You unliked this article',
-            'status' => 200
-        ]);
+        return sendResponse(null,200,'You unliked this article');
     }
 }

@@ -46,5 +46,10 @@ class AuthServiceProvider extends ServiceProvider
             return ($user->type === 'admin' || $user->type === 'bussiness_ower') ? true : false;
         });
 
+        //notification authorization
+        Gate::define('auth-noti',function(User $user){
+            return $user->type === 'admin';
+        });
+
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SaveDeleteRequest extends FormRequest
+class NotificationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,8 @@ class SaveDeleteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'save_id' => 'required'
+            'title' => ['required','string'],
+            'description' => ['required','string']
         ];
     }
 }
