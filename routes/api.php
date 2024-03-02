@@ -44,8 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         //saves
         Route::group(["prefix" => "saves", "controller" => SaveController::class],function(){
             Route::get('/','index');
-            Route::post('/','store');
-            Route::delete('/','destroy');
+            Route::post('/','toggle');
         });
     });
 

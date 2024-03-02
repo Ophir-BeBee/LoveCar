@@ -36,11 +36,6 @@ class AuthServiceProvider extends ServiceProvider
             return ($user->type === 'admin' || $comment->user_id === $user->id) ? true : false;
         });
 
-        //unsave authorization
-        Gate::define('auth-unsave',function(User $user,Save $save){
-            return $save->user_id === $user->id;
-        });
-
         //shop autorization
         Gate::define('auth-shop',function(User $user){
             return ($user->type === 'admin' || $user->type === 'bussiness_ower') ? true : false;
