@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\CommentRequest;
-use App\Http\Requests\CommentCreateRequest;
-use App\Http\Requests\CommentDeleteRequest;
-use App\Http\Requests\CommentUpdateRequest;
 
 class CommentController extends Controller
 {

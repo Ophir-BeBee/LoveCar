@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Photo;
 use App\Models\Article;
 use App\Models\ArticleView;
 use App\Models\ArticleImage;
@@ -11,9 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\ArticleRequest;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\ArticleUpateRequest;
-use App\Http\Requests\ArticleCreateRequest;
-use App\Http\Requests\ArticleDeleteRequest;
 
 class ArticleController extends Controller
 {
