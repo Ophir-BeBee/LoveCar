@@ -4,18 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\ShopImage;
-use App\Models\ShopService;
 use Illuminate\Http\Request;
 use App\Models\ShopToService;
 use App\Models\ShopToCategory;
-use App\Models\ShopToServices;
 use App\Models\ShopServiceItem;
 use App\Http\Requests\ShopRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\ShopCreateRequest;
-use App\Http\Requests\ShopUpdateRequest;
 
 class ShopController extends Controller
 {
