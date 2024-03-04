@@ -35,7 +35,13 @@ class Shop extends Model
         return $this->hasMany(ShopImage::class);
     }
 
+    //connect with favorites
     public function favorite_shops(){
         return $this->hasMany(FavoriteShop::class);
+    }
+
+    //connect with ads
+    public function shop_ads(){
+        return $this->hasMany(ShopAd::class);
     }
 }

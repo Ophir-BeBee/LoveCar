@@ -46,5 +46,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->type === 'admin';
         });
 
+        //shop ads authorization
+        Gate::define('auth-shopAds',function(User $user){
+            return $user->type === 'admin';
+        });
+
     }
 }
