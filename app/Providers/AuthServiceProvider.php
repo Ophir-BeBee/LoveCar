@@ -59,9 +59,14 @@ class AuthServiceProvider extends ServiceProvider
             return $rating->user_id == Auth::user()->id;
         });
 
-        //shop rating delete
+        //shop rating delete authorization
         Gate::define('auth-rating-delete',function(User $user,Shop $shop){
             return ($user->type === 'admin' || $shop->user_id === Auth::user()->id) ? true : false;
+        });
+
+        //shop category authorization
+        Gate::define('auth-shop-category',function(User $user){
+            return $user->type === 'admin';
         });
 
     }
