@@ -69,5 +69,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->type === 'admin';
         });
 
+        //shop category service
+        Gate::define('auth-shop-service',function(User $user){
+            return ($user->type === 'admin' || $user->type === 'bussiness_owner') ? true : false;
+        });
+
     }
 }

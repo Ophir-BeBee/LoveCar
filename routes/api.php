@@ -14,6 +14,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ShopAdController;
 use App\Http\Controllers\ShopCategoryController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\ShopServiceController;
 use App\Models\Notification;
 use App\Models\ShopCategory;
 
@@ -98,8 +99,17 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/update','update');
             Route::delete('/','destroy');
         });
+
         //category
         Route::group(["prefix" => "categories", "controller" => ShopCategoryController::class],function(){
+            Route::get('/','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
+        });
+
+        //service
+        Route::group(["prefix" => "services", "controller" => ShopServiceController::class],function(){
             Route::get('/','index');
             Route::post('/','store');
             Route::post('/update','update');
