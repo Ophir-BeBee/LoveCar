@@ -10,6 +10,7 @@ use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ShopAdController;
 use App\Http\Controllers\ShopController;
 use App\Models\Notification;
@@ -84,6 +85,13 @@ Route::middleware('auth:sanctum')->group(function () {
         //ads
         Route::group(["prefix" => "ads", "controller" => ShopAdController::class],function(){
             Route::get('/','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
+        });
+
+        //ratings
+        Route::group(["prefix" => "ratings", "controller" => RatingController::class],function(){
             Route::post('/','store');
             Route::post('/update','update');
             Route::delete('/','destroy');

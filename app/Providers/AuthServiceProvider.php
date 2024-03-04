@@ -5,8 +5,11 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 use App\Models\Post;
 use App\Models\Save;
+use App\Models\Shop;
 use App\Models\User;
+use App\Models\Rating;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -49,6 +52,16 @@ class AuthServiceProvider extends ServiceProvider
         //shop ads authorization
         Gate::define('auth-shopAds',function(User $user){
             return $user->type === 'admin';
+        });
+
+        //shop rating update authorization
+        Gate::define('auth-rating-update',function(Rating $rating){
+            return $rating->user_id == Auth::user()->id;
+        });
+
+        //shop rating delete
+        Gate::define('auth-rating-delete',function(User $user,Shop $shop){
+            return ($user->type === 'admin' || $shop->user_id === Auth::user()->id) ? true : false;
         });
 
     }

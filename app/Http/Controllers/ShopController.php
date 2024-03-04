@@ -61,6 +61,11 @@ class ShopController extends Controller
                 }]);
             }]);
         }])
+        ->withCount('ratings')
+        ->with(['ratings' => function($query){
+            $query->select('id','user_id','shop_id','star','feedback');
+            $query->with('user:id,name');
+        }])
         ->with('shop_images:id,shop_id,name')
         ->first();
         return sendResponse($data,200);

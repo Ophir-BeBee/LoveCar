@@ -19,6 +19,7 @@ return new class extends Migration
             $table->float('longitude',8,6);
             $table->string('phone');
             $table->string('address');
+            $table->float('ratings')->default(0);
             $table->string('logo')->nullable();
             $table->timestamps();
         });
