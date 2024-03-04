@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->references('id')->on('users')->cascadeOnDelete();
             $table->string('name');
-            $table->float('latitude',2,6);
-            $table->float('longitude',2,6);
+            $table->float('latitude',8,6);
+            $table->float('longitude',8,6);
             $table->string('phone');
             $table->string('address');
             $table->string('logo')->nullable();
