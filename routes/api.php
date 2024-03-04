@@ -15,8 +15,6 @@ use App\Http\Controllers\ShopAdController;
 use App\Http\Controllers\ShopCategoryController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ShopServiceController;
-use App\Models\Notification;
-use App\Models\ShopCategory;
 
 Route::controller(UserController::class)->group(function(){
     Route::post('/login','login');
