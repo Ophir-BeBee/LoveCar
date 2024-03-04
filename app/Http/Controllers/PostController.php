@@ -84,7 +84,7 @@ class PostController extends Controller
             }])
             ->with('post_images')
             ->first();
-        return sendResponse(new PostResource($data),200);
+        return sendResponse(new PostResource($data),200,'Post has been uploaded');
     }
 
     //view posts
