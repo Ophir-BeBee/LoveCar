@@ -127,7 +127,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         //fuel costs
         Route::group(["prefix" => "fuel_costs", "controller" => FuelCostController::class],function(){
-            Route::get('/','index');
+            Route::get('/{carId}/{month}/{year}','index');
             Route::post('/','store');
             Route::post('/update','update');
             Route::delete('/','destroy');

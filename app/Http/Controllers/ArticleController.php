@@ -54,7 +54,7 @@ class ArticleController extends Controller
     public function store(ArticleRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
-            return sendResponse(null,401,"Not allowed");
+            return sendResponse(401,"Not allowed");
         }
 
         //create data or article
@@ -69,7 +69,7 @@ class ArticleController extends Controller
             //four photos validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return sendResponse(null,405,"Can't upload more than 4 photos");
+                return sendResponse(405,"Can't upload more than 4 photos");
             }
 
             //store photos
@@ -92,7 +92,7 @@ class ArticleController extends Controller
             'user_id' => Auth::user()->id,
             'article_id' => $request->article_id
         ]);
-        return sendResponse(null,200,'You viewed this article');
+        return sendResponse(200,'You viewed this article');
     }
 
     //update article
@@ -100,13 +100,13 @@ class ArticleController extends Controller
 
         //user authorization
         if(Gate::denies('auth-post')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         $article = $this->model->find($request->article_id);
 
         if(!$article){
-            return sendResponse(null,404,'Article not found');
+            return sendResponse(404,'Article not found');
         }
 
         //update data
@@ -129,7 +129,7 @@ class ArticleController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return sendResponse(null,405,"Can't upload more than 4 photos");
+                return sendResponse(405,"Can't upload more than 4 photos");
             }
 
             //update images
@@ -153,7 +153,7 @@ class ArticleController extends Controller
 
             // user authorization
             if(Gate::denies('auth-post')){
-                return sendResponse(null,401,'Not allowed');
+                return sendResponse(401,'Not allowed');
             }
 
             //image manual delete
@@ -164,7 +164,7 @@ class ArticleController extends Controller
             }
 
             $this->model->find($request->article_id)->delete();
-            return sendResponse(null,200,'Article has beeen deleted');
+            return sendResponse(200,'Article has beeen deleted');
         }
 
     //change article data to array

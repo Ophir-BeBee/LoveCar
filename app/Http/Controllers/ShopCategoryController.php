@@ -27,13 +27,13 @@ class ShopCategoryController extends Controller
     public function store(ShopCategoryRequest $request){
         //user authorization
         if(Gate::denies('auth-shop-category')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         //check category
         $category = $this->model->where('name',$request->name)->first();
         if($category){
-            return sendResponse(null,405,'Category already exist');
+            return sendResponse(405,'Category already exist');
         }
 
         //create category
@@ -45,19 +45,19 @@ class ShopCategoryController extends Controller
     public function update(ShopCategoryRequest $request){
         //user authorization
         if(Gate::denies('auth-shop-category')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         //check category
         $category = $this->model->find($request->category_id);
         if(!$category){
-            return sendResponse(null,405,'Category not found');
+            return sendResponse(405,'Category not found');
         }
 
         //check name available or not
         $check = $this->model->where('name',$request->name)->first();
         if($check){
-            return sendResponse(null,405,'Category already exist');
+            return sendResponse(405,'Category already exist');
         }
 
         $category->update(['name'=>$request->name]);
@@ -68,17 +68,17 @@ class ShopCategoryController extends Controller
     public function destroy(Request $request){
         //user authorization
         if(Gate::denies('auth-shop-category')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         //check category
         $category = $this->model->find($request->category_id);
         if(!$category){
-            return sendResponse(null,404,'Category not found');
+            return sendResponse(404,'Category not found');
         }
 
         //delete category
         $category->delete();
-        return sendResponse(null,200,'Category deleted success');
+        return sendResponse(200,'Category deleted success');
     }
 }

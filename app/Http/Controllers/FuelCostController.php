@@ -19,15 +19,22 @@ class FuelCostController extends Controller
     }
 
     //get all fuel costs of car
-    public function index(Request $request){
+    public function index($carId,$month,$year){
         //check car
-        $car = Car::find($request->car_id);
+        $car = Car::find($carId);
         if(!$car){
             return sendResponse(null,404,'Car not found');
         }
 
         //get data
-        $data = $this->model->where('car_id',$car->id)->get();
+        $data = $this->model
+        ->where('car_id',$car->id)
+        ->whereYear('created_at',$year)
+        ->whereMonth('created_at',$month)
+        ->get();
+        if(count($data)==0){
+            return sendResponse(null,404,'No history this month');
+        }
         return sendResponse($data,200);
     }
 

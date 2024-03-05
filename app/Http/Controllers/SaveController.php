@@ -30,7 +30,7 @@ class SaveController extends Controller
         ->get();
 
         if(count($saves) == 0){
-            return sendResponse(null,404,'You have no save post');
+            return sendResponse(404,'You have no save post');
         }
 
         return sendResponse(SaveResource::collection($saves),200);
@@ -41,7 +41,7 @@ class SaveController extends Controller
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return sendResponse(null,404,'Post not found');
+            return sendResponse(404,'Post not found');
         }
 
         //check saved or not
