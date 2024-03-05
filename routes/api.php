@@ -9,6 +9,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\CarServicingCostController;
 use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\FuelCostController;
 use App\Http\Controllers\NotificationController;
@@ -128,6 +129,14 @@ Route::middleware('auth:sanctum')->group(function () {
         //fuel costs
         Route::group(["prefix" => "fuel_costs", "controller" => FuelCostController::class],function(){
             Route::get('/{carId}/{month}/{year}','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
+        });
+
+        //servicing cost
+        Route::group(["prefix" => "servicing_costs", "controller" => CarServicingCostController::class],function(){
+            Route::get('/{carId}/{year}','index');
             Route::post('/','store');
             Route::post('/update','update');
             Route::delete('/','destroy');

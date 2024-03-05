@@ -4,6 +4,7 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 use App\Models\Car;
+use App\Models\CarServicingCost;
 use App\Models\Post;
 use App\Models\Save;
 use App\Models\Shop;
@@ -90,10 +91,21 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $car->user_id;
         });
 
-        //fule cost delete authorization
+        //fuel cost delete authorization
         Gate::define('auth-car-fuel_cost-delete',function(User $user,Car $car){
             return ($user->type === 'admin' || $car->user_id === $user->id) ? true : false;
         });
+
+        //servicing cost authorization
+        Gate::define('auth-car-servicing_cost-update',function(User $user,Car $car){
+            return $car->user_id === $user->id;
+        });
+
+        //servicing cost authorization
+        Gate::define('auth-car-servicing_cost-delete',function(User $user,Car $car){
+            return ($car->user_id === $user->id || $user->type === 'admin');
+        });
+
 
     }
 }
