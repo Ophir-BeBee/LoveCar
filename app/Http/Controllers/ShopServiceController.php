@@ -27,13 +27,13 @@ class ShopServiceController extends Controller
     public function store(ShopServiceRequest $request){
         //user authorization
         if(Gate::denies('auth-shop-service')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         //check service
         $service = $this->model->where('name',$request->name)->first();
         if($service){
-            return sendResponse(null,405,'Service already exist');
+            return sendResponse(405,'Service already exist');
         }
 
         //create service
@@ -45,19 +45,19 @@ class ShopServiceController extends Controller
     public function update(ShopServiceRequest $request){
          //user authorization
          if(Gate::denies('auth-shop-service')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         //check category
         $service = $this->model->find($request->service_id);
         if(!$service){
-            return sendResponse(null,405,'Service not found');
+            return sendResponse(405,'Service not found');
         }
 
         //check name available or not
         $check = $this->model->where('name',$request->name)->first();
         if($check){
-            return sendResponse(null,405,'Service already exist');
+            return sendResponse(405,'Service already exist');
         }
 
         $service->update(['name'=>$request->name]);
@@ -68,17 +68,17 @@ class ShopServiceController extends Controller
     public function destroy(Request $request){
         //user authorization
         if(Gate::denies('auth-shop-service')){
-            return sendResponse(null,401,'Not allowed');
+            return sendResponse(401,'Not allowed');
         }
 
         //check category
         $service = $this->model->find($request->service_id);
         if(!$service){
-            return sendResponse(null,404,'Service not found');
+            return sendResponse(404,'Service not found');
         }
 
         //delete service
         $service->delete();
-        return sendResponse(null,200,'Service deleted success');
+        return sendResponse(200,'Service deleted success');
     }
 }
