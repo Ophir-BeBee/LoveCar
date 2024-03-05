@@ -8,6 +8,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ArticleLikeController;
+use App\Http\Controllers\CarController;
 use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RatingController;
@@ -113,6 +114,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/update','update');
             Route::delete('/','destroy');
         });
+    });
+
+    //cars
+    Route::group(["prefix" => "cars", "controller" => CarController::class],function(){
+        Route::post('/','store');
+        Route::get('/','index');
+        Route::post('/update','update');
+        Route::get('/all','all');
+        Route::delete('/','destroy');
     });
 
     //notifications

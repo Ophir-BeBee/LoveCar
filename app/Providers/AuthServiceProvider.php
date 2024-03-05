@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
+use App\Models\Car;
 use App\Models\Post;
 use App\Models\Save;
 use App\Models\Shop;
@@ -72,6 +73,15 @@ class AuthServiceProvider extends ServiceProvider
         //shop category service
         Gate::define('auth-shop-service',function(User $user){
             return ($user->type === 'admin' || $user->type === 'bussiness_owner') ? true : false;
+        });
+
+        //car authorization
+        Gate::define('auth-car-update',function(User $user,Car $car){
+            return $car->user_id === $user->id;
+        });
+
+        Gate::define('auth-car-delete',function(User $user,Car $car){
+            return ($car->user_id === $user->id || $user->type === 'admin') ? true : false;
         });
 
     }
