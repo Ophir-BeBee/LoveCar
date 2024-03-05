@@ -10,6 +10,7 @@ use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\FavoriteShopController;
+use App\Http\Controllers\FuelCostController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ShopAdController;
@@ -123,6 +124,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update','update');
         Route::get('/all','all');
         Route::delete('/','destroy');
+
+        //fuel costs
+        Route::group(["prefix" => "fuel_costs", "controller" => FuelCostController::class],function(){
+            Route::get('/','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
+        });
     });
 
     //notifications

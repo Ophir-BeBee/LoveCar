@@ -75,13 +75,24 @@ class AuthServiceProvider extends ServiceProvider
             return ($user->type === 'admin' || $user->type === 'bussiness_owner') ? true : false;
         });
 
-        //car authorization
+        //car update authorization
         Gate::define('auth-car-update',function(User $user,Car $car){
             return $car->user_id === $user->id;
         });
 
+        //car delete authorization
         Gate::define('auth-car-delete',function(User $user,Car $car){
             return ($car->user_id === $user->id || $user->type === 'admin') ? true : false;
+        });
+
+        //fuel cost authorization
+        Gate::define('auth-car-fuel_cost',function(User $user,Car $car){
+            return $user->id === $car->user_id;
+        });
+
+        //fule cost delete authorization
+        Gate::define('auth-car-fuel_cost-delete',function(User $user,Car $car){
+            return ($user->type === 'admin' || $car->user_id === $user->id) ? true : false;
         });
 
     }

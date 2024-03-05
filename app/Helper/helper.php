@@ -1,7 +1,7 @@
 <?php
 
 if (!function_exists('sendResponse')) {
-    function sendResponse($status,$message="No message",$data=null)
+    function sendResponse($data,$status,$message="No message")
     {
         $response = [
             'data'    => $data,

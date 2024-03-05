@@ -25,4 +25,9 @@ class Car extends Model
     public function model(){
         return $this->belongsTo(CarModel::class);
     }
+
+    //connect with fuel costs
+    public function fuel_costs(){
+        return $this->hasMany(FuelCost::class);
+    }
 }
