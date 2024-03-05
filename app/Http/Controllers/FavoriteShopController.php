@@ -22,7 +22,7 @@ class FavoriteShopController extends Controller
         $data = $this->model->with('shop:id,name,logo,address')->get();
 
         if(count($data)==0){
-            return sendResponse(null,404,'You have no favorite shop');
+            return sendResponse(404,'You have no favorite shop');
         }
 
         return sendResponse($data,200);
@@ -33,13 +33,13 @@ class FavoriteShopController extends Controller
         //check shop exist
         $shop = Shop::find($request->shop_id);
         if(!$shop){
-            return sendResponse(null,404,'Shop not found');
+            return sendResponse(404,'Shop not found');
         }
 
         //check favorite shop
         $favoriteShop = $this->model->where('shop_id',$request->shop_id)->first();
         if($favoriteShop){
-            return sendResponse(null,405,'You already added this shop to favorites');
+            return sendResponse(405,'You already added this shop to favorites');
         }
 
         //create favorite
@@ -56,16 +56,16 @@ class FavoriteShopController extends Controller
         //check shop
         $shop = Shop::find($request->shop_id);
         if(!$shop){
-            return sendResponse(null,404,'Shop not found');
+            return sendResponse(404,'Shop not found');
         }
 
         //check favorite shop
         $favoriteShop = $this->model->where('shop_id',$request->shop_id)->first();
         if(!$favoriteShop){
-            return sendResponse(null,405,'You already removed this shop from favorties');
+            return sendResponse(405,'You already removed this shop from favorties');
         }
 
         $favoriteShop->delete();
-        return sendResponse(null,200,'You removed this shop from favorites');
+        return sendResponse(200,'You removed this shop from favorites');
     }
 }
