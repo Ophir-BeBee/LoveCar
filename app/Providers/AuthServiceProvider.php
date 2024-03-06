@@ -117,5 +117,15 @@ class AuthServiceProvider extends ServiceProvider
             return ($user->type === 'admin' || $car->user_id === $user->id);
         });
 
+        //rental cost update authorization
+        Gate::define('auth-rental_cost-update',function(User $user,Car $car){
+            return $car->user_id === $user->id;
+        });
+
+        //rental cost delete authorization
+        Gate::define('auth-rental_cost-delete',function(User $user,Car $car){
+            return ($car->user_id === $user->id || $user->type === 'admin');
+        });
+
     }
 }

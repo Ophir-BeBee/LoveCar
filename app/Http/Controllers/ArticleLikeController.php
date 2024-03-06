@@ -17,9 +17,8 @@ class ArticleLikeController extends Controller
         $this->model = $model;
     }
 
-    //give like
-    public function store(Request $request){
-        //check article
+    public function toggle(Request $request){
+        //check post
         $article = Article::find($request->article_id);
         if(!$article){
             return sendResponse(null,404,'Article not found');
@@ -28,27 +27,36 @@ class ArticleLikeController extends Controller
         //check liked or not
         $check = $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->first();
         if($check){
-            return sendResponse(null,405,'You already liked this article');
+            //delete like
+            $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->delete();
+            //get post data to return
+            $data = Article::where('id',$request->article_id)
+            ->select('id')
+            ->withCount('article_likes')
+            ->withCount(['article_likes as is_liked' => function($query){
+                $query->where('article_likes.user_id',Auth::user()->id);
+            }])
+            ->first();
+            return sendResponse($data,200,'You unliked this article');
         }
 
-        //create like
-        $data = $this->model->create([
+         //create like
+         $data = $this->model->create([
             'user_id' => Auth::user()->id,
             'article_id' => $request->article_id
         ]);
-        return sendResponse($data,200,'You liked this article');
-    }
 
-    //unlike article
-    public function destroy(Request $request){
-        //check article
-        $article = Article::find($request->article_id);
-        if(!$article){
-            return sendResponse(null,404,'Article not found');
-        }
-
-        //delete like
-        $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->delete();
-        return sendResponse(null,200,'You unliked this article');
+        $data = $this->model
+        ->where('article_id',$request->article_id)
+        ->select('id','article_id')
+        ->with(['article' => function($query){
+            $query->select('id')
+            ->withCount('article_likes')
+            ->withCount(['article_likes as is_liked' => function($query){
+                $query->where('article_likes.user_id',Auth::user()->id);
+            }]);
+        }])
+        ->first();
+        return sendResponse($data->article,200,'You liked this article');
     }
 }

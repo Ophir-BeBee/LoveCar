@@ -15,6 +15,7 @@ use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\FuelCostController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\RentalCostController;
 use App\Http\Controllers\ShopAdController;
 use App\Http\Controllers\ShopCategoryController;
 use App\Http\Controllers\ShopController;
@@ -66,8 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         //likes
         Route::group(["prefix" => "likes", "controller" => ArticleLikeController::class],function(){
-            Route::post('/','store');
-            Route::delete('/','destroy');
+            Route::post('/','toggle');
         });
     });
 
@@ -150,6 +150,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/update','update');
             Route::delete('/','destroy');
             Route::post('/checked','checked');
+        });
+
+        //Rental cost
+        Route::group(["prefix" => "rental_costs", "controller" => RentalCostController::class],function(){
+            Route::get('/{carId}/{month}/{year}','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
         });
     });
 
