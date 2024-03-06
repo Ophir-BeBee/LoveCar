@@ -7,6 +7,7 @@ use App\Models\Income;
 use App\Models\IncomeDate;
 use Illuminate\Http\Request;
 use App\Http\Requests\IncomeRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class IncomeController extends Controller
@@ -27,7 +28,7 @@ class IncomeController extends Controller
             $query->where('car_id',$carId);
         }])
         ->get();
-        return $data;
+        return sendResponse($data,200);
     }
 
     //create income
@@ -35,7 +36,10 @@ class IncomeController extends Controller
         //check date
         $date = IncomeDate::where('date',$request->date)->first();
         if(!$date){
-            $date = IncomeDate::create(["date" => $request->date]);
+            $date = IncomeDate::create([
+                "user_id" => Auth::user()->id,
+                "date" => $request->date
+            ]);
         }
         //check car
         $car = Car::find($request->incomes[0]['car_id']);
@@ -129,6 +133,7 @@ class IncomeController extends Controller
         }
 
         $this->model->where('income_date_id',$income_date->id)->delete();
-        return sendResponse(null,200,'Incomet deleted success');
+        IncomeDate::where('id',$income_date->id)->where('user_id',Auth::user()->id)->delete();
+        return sendResponse(null,200,'Income deleted success');
     }
 }

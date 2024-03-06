@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Car;
 use App\Models\CheckList;
 use Illuminate\Http\Request;
+use App\Models\CheckListCategory;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\CheckListRequest;
 use App\Http\Resources\CheckListResource;
-use App\Models\CheckListCategory;
-use Illuminate\Support\Facades\Gate;
 
 class CheckListController extends Controller
 {
@@ -38,7 +39,10 @@ class CheckListController extends Controller
         //check category
         $category = CheckListCategory::where('name',$request->category)->first();
         if(!$category){
-            $category = CheckListCategory::create(['name' => $request->category]);
+            $category = CheckListCategory::create([
+                'user_id' => Auth::user()->id,
+                'name' => $request->category
+            ]);
         }
 
         //assign array
@@ -146,7 +150,7 @@ class CheckListController extends Controller
         }
 
         $this->model->where('category_id',$category->id)->delete();
-        $category->delete();
+        CheckListCategory::where('id',$category->id)->where('user_id',Auth::user()->id)->delete();
         return sendResponse(null,200,'Check list deleted success');
     }
 

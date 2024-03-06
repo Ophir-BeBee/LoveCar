@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('check_list_categories', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id')->constrained()->references('id')->on('users')->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
         });

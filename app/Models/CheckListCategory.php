@@ -9,7 +9,7 @@ class CheckListCategory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['user_id','name'];
 
     //connect with check list
     public function check_lists(){
