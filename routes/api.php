@@ -13,6 +13,7 @@ use App\Http\Controllers\CarServicingCostController;
 use App\Http\Controllers\CheckListController;
 use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\FuelCostController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RentalCostController;
@@ -154,6 +155,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         //Rental cost
         Route::group(["prefix" => "rental_costs", "controller" => RentalCostController::class],function(){
+            Route::get('/{carId}/{month}/{year}','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
+        });
+
+        //incomes
+        Route::group(["prefix" => "incomes", "controller" => IncomeController::class],function(){
             Route::get('/{carId}/{month}/{year}','index');
             Route::post('/','store');
             Route::post('/update','update');

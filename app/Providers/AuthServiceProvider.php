@@ -127,5 +127,15 @@ class AuthServiceProvider extends ServiceProvider
             return ($car->user_id === $user->id || $user->type === 'admin');
         });
 
+        //income update authorization
+        Gate::define('auth-income-update',function(User $user,Car $car){
+            return $car->user_id === $user->id;
+        });
+
+        //income delete authorization
+        Gate::define('auth-income-delete',function(User $user,Car $car){
+            return ($car->user_id === $user->id || $user->type === 'admin');
+        });
+
     }
 }
