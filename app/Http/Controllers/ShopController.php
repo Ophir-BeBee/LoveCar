@@ -4,18 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Shop;
 use App\Models\ShopImage;
-use App\Models\ShopService;
 use Illuminate\Http\Request;
 use App\Models\ShopToService;
 use App\Models\ShopToCategory;
-use App\Models\ShopToServices;
 use App\Models\ShopServiceItem;
 use App\Http\Requests\ShopRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\ShopCreateRequest;
-use App\Http\Requests\ShopUpdateRequest;
 
 class ShopController extends Controller
 {
@@ -64,6 +60,11 @@ class ShopController extends Controller
                     $query->select('id','shop_id','shop_service_id','name');
                 }]);
             }]);
+        }])
+        ->withCount('ratings')
+        ->with(['ratings' => function($query){
+            $query->select('id','user_id','shop_id','star','feedback');
+            $query->with('user:id,name');
         }])
         ->with('shop_images:id,shop_id,name')
         ->first();

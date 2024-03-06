@@ -9,7 +9,7 @@ class Shop extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id','shop_category_id','name','latitude','longitude','phone','address'];
+    protected $fillable = ['user_id','shop_category_id','name','latitude','longitude','phone','address','ratings'];
 
     //connect with user
     public function user(){
@@ -35,7 +35,18 @@ class Shop extends Model
         return $this->hasMany(ShopImage::class);
     }
 
+    //connect with favorites
     public function favorite_shops(){
         return $this->hasMany(FavoriteShop::class);
+    }
+
+    //connect with ads
+    public function shop_ads(){
+        return $this->hasMany(ShopAd::class);
+    }
+
+    //connect with ratings
+    public function rating(){
+        return $this->hasMany(Rating::class);
     }
 }

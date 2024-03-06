@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\CommentRequest;
-use App\Http\Requests\CommentCreateRequest;
-use App\Http\Requests\CommentDeleteRequest;
-use App\Http\Requests\CommentUpdateRequest;
 
 class CommentController extends Controller
 {
@@ -33,7 +30,7 @@ class CommentController extends Controller
         //create comment
         $data = $this->changeCreateCommentDataToArray($request);
         $comment = $this->model->create($data);
-        $data = $this->find($comment->id)->with('user:id,name');
+        $data = $this->model->where('id',$comment->id)->with('user:id,name')->first();
         return sendResponse($data,200,"You've commented on this post");
     }
 
@@ -62,16 +59,16 @@ class CommentController extends Controller
         }
 
         //update comment
-        $comment = $comment->update([
+        $comment->update([
             'text' => $request->text
         ]);
-        $data = $this->find($comment->id)->with('user:id,name');
+        $data = $this->model->where('id',$comment->id)->with('user:id,name')->first();
         return sendResponse($data,200,'Comment has been updated');
     }
 
     //show comment
     public function show($post_id){
-        $data = $this->model->where('post_id',$post_id)->with('user:id,name')->get();
+        $data = $this->model->where('post_id',$post_id)->with('user:id,name')->orderBy('id','desc')->get();
         return sendResponse($data,200);
     }
 

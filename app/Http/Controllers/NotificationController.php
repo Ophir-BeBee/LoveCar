@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\NotificationRequest;
-use App\Http\Requests\NotificationCreateRequest;
 
 class NotificationController extends Controller
 {

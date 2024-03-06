@@ -7,13 +7,10 @@ use App\Models\PostView;
 use App\Models\PostImage;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
-use Illuminate\Support\Facades\DB;
+use App\Http\Resources\PostResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\PostCreateRequest;
-use App\Http\Requests\PostDeleteRequest;
-use App\Http\Requests\PostUpdateRequest;
 
 class PostController extends Controller
 {
@@ -33,10 +30,13 @@ class PostController extends Controller
         ->withCount(['post_likes as is_liked' => function($query){
             $query->where('post_likes.user_id',Auth::user()->id);
         }])
+        ->withCount(['saves as is_saved' => function($query){
+            $query->where('saves.user_id',Auth::user()->id);
+        }])
         ->withCount('comments')
         ->orderBy('id','desc')
         ->get();
-        return sendResponse($data,200);
+        return sendResponse(PostResource::collection($data),200);
     }
 
     //create posts
@@ -79,8 +79,12 @@ class PostController extends Controller
                 $query->with('user:id,name');
                 $query->orderBy('id','desc');
             }])
+            ->withCount(['saves as is_saved' => function($query){
+                $query->where('saves.user_id',Auth::user()->id);
+            }])
+            ->with('post_images')
             ->first();
-        return sendResponse($data,200);
+        return sendResponse(new PostResource($data),200,'Post has been uploaded');
     }
 
     //view posts
@@ -149,8 +153,12 @@ class PostController extends Controller
             $query->with('user:id,name');
             $query->orderBy('id','desc');
         }])
+        ->withCount(['saves as is_saved' => function($query){
+            $query->where('saves.user_id',Auth::user()->id);
+        }])
+        ->with('post_images')
         ->first();
-        return sendResponse($data,200);
+        return sendResponse(new PostResource($data),200);
     }
 
     //delete posts
