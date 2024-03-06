@@ -6,6 +6,7 @@ use App\Models\Car;
 use App\Models\CarBrand;
 use Illuminate\Http\Request;
 use App\Http\Requests\CarRequest;
+use App\Http\Resources\AllCarsResource;
 use App\Http\Resources\CarResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -34,7 +35,7 @@ class CarController extends Controller
     //all cars
     public function all(){
         $cars = CarBrand::select('id','name')->with('car_models:id,brand_id,name,image')->get();
-        return sendResponse($cars,200);
+        return sendResponse(AllCarsResource::collection($cars),200);
     }
 
     //store car
