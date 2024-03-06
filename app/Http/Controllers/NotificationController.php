@@ -45,7 +45,7 @@ class NotificationController extends Controller
     public function store(NotificationRequest $request){
         //user authorization
         if(Gate::denies('auth-noti')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         $notification = $this->model->create($this->changeNotificationDataToArray($request));
@@ -55,13 +55,13 @@ class NotificationController extends Controller
     public function update(NotificationRequest $request){
         //user authorization
         if(Gate::denies('auth-noti')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //check notification
         $notification = $this->model->find($request->id);
         if(!$notification){
-            return sendResponse(404,'Notification not found');
+            return sendResponse(null,404,'Notification not found');
         }
 
         //update data
@@ -80,13 +80,13 @@ class NotificationController extends Controller
         //check noti
         $notification = $this->model->find($request->notification_id);
         if(!$notification){
-            return sendResponse(404,'Notification not found');
+            return sendResponse(null,404,'Notification not found');
         }
 
         //check read
         $check = ReadNotification::where('notifications_id',$notification->id)->where('user_id',Auth::user()->id);
         if($check){
-            return sendResponse(405,'You already read this notification');
+            return sendResponse(null,405,'You already read this notification');
         }
 
         $data = ReadNotification::create([
@@ -101,7 +101,7 @@ class NotificationController extends Controller
         //check noti
         $notification = $this->model->find($request->notification_id);
         if(!$notification){
-            return sendResponse(404,'Notification not found');
+            return sendResponse(null,404,'Notification not found');
         }
 
         $data = HideNotification::create([
@@ -115,7 +115,7 @@ class NotificationController extends Controller
     public function destroy(Request $request){
         //user authorization
         if(Gate::denies('auth-noti')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
 
@@ -123,9 +123,9 @@ class NotificationController extends Controller
         //check noti
         $notification = $this->model->find($request->notification_id);
         if(!$notification){
-            return sendResponse(200,'You already delete this notification');
+            return sendResponse(null,200,'You already delete this notification');
         }
-        return sendResponse(200,'Notification delete success');
+        return sendResponse(null,200,'Notification delete success');
     }
 
     //change notification create data to array

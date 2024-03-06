@@ -5,6 +5,7 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 use App\Models\Car;
 use App\Models\CarServicingCost;
+use App\Models\CheckList;
 use App\Models\Post;
 use App\Models\Save;
 use App\Models\Shop;
@@ -106,6 +107,15 @@ class AuthServiceProvider extends ServiceProvider
             return ($car->user_id === $user->id || $user->type === 'admin');
         });
 
+        //check list update authorization
+        Gate::define('auth-checkList-update',function(User $user,Car $car){
+            return $car->user_id === $user->id;
+        });
+
+        //check list delete authorization
+        Gate::define('auth-checkList-delete',function(User $user,Car $car){
+            return ($user->type === 'admin' || $car->user_id === $user->id);
+        });
 
     }
 }

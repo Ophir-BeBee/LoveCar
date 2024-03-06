@@ -22,7 +22,7 @@ class PostLikeController extends Controller
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return sendResponse(404,'Post not found');
+            return sendResponse(null,404,'Post not found');
         }
 
         //check liked or not

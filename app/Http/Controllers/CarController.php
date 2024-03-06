@@ -56,12 +56,12 @@ class CarController extends Controller
         //check car
         $car = $this->model->find($request->car_id);
         if(!$car){
-            return sendResponse(404,'Car not found');
+            return sendResponse(null,404,'Car not found');
         }
 
         //user authorization
         if(Gate::denies('auth-car-update',$car)){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         $data = $this->changeCarDataToArray($request,'update');
@@ -80,16 +80,16 @@ class CarController extends Controller
         //check car
         $car = $this->model->find($request->car_id);
         if(!$car){
-            return sendResponse(405,'Car already deleted');
+            return sendResponse(null,405,'Car already deleted');
         }
 
         //user authorization
         if(Gate::denies('auth-car-delete',$car)){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         $car->delete();
-        return sendResponse(200,'Car has been deleted');
+        return sendResponse(null,200,'Car has been deleted');
     }
 
     //change car data to array

@@ -43,7 +43,7 @@ class PostController extends Controller
     public function store(PostRequest $request){
         //user authorization
         if(Gate::denies('auth-post')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //create data of posts
@@ -58,7 +58,7 @@ class PostController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return sendResponse(405,"Can't upload more than 4 photos");
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //store images
@@ -93,7 +93,7 @@ class PostController extends Controller
             'user_id' => Auth::user()->id,
             'post_id' => $request->post_id
         ]);
-        return sendResponse(200,'You viewed this post');
+        return sendResponse(null,200,'You viewed this post');
     }
 
     //update posts
@@ -101,13 +101,13 @@ class PostController extends Controller
 
         //user authorization
         if(Gate::denies('auth-post')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         $post = $this->model->find($request->post_id);
 
         if(!$post){
-            return sendResponse(404,'Post not found');
+            return sendResponse(null,404,'Post not found');
         }
 
         //update data
@@ -130,7 +130,7 @@ class PostController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>4){
-                return sendResponse(405,"Can't upload more than 4 photos");
+                return sendResponse(null,405,"Can't upload more than 4 photos");
             }
 
             //update images
@@ -166,7 +166,7 @@ class PostController extends Controller
 
         // user authorization
         if(Gate::denies('auth-post')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //image manual delete
@@ -177,7 +177,7 @@ class PostController extends Controller
         }
 
         $this->model->find($request->post_id)->delete();
-        return sendResponse(200,'Post has been deleted');
+        return sendResponse(null,200,'Post has been deleted');
     }
 
     //change post data to array

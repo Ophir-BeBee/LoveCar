@@ -24,7 +24,7 @@ class CommentController extends Controller
         //check post
         $post = Post::find($request->post_id);
         if(!$post){
-            return sendResponse(404,'Post not found');
+            return sendResponse(null,404,'Post not found');
         }
 
         //create comment
@@ -41,11 +41,11 @@ class CommentController extends Controller
 
         //user authorization
         if(Gate::denies('auth-comment', $comment)){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         $comment->delete();
-        return sendResponse(200,'You deleted this comment');
+        return sendResponse(null,200,'You deleted this comment');
     }
 
     //update comment
@@ -55,7 +55,7 @@ class CommentController extends Controller
 
         //check comment
         if(!$comment){
-            return sendResponse(404,'Comment not found');
+            return sendResponse(null,404,'Comment not found');
         }
 
         //update comment

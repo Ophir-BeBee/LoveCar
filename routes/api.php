@@ -10,6 +10,7 @@ use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\ArticleLikeController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CarServicingCostController;
+use App\Http\Controllers\CheckListController;
 use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\FuelCostController;
 use App\Http\Controllers\NotificationController;
@@ -140,6 +141,15 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/','store');
             Route::post('/update','update');
             Route::delete('/','destroy');
+        });
+
+        //check lists
+        Route::group(["prefix" => "check_lists", "controller" => CheckListController::class],function(){
+            Route::get('/{carId}','index');
+            Route::post('/','store');
+            Route::post('/update','update');
+            Route::delete('/','destroy');
+            Route::post('/checked','checked');
         });
     });
 

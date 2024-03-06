@@ -22,13 +22,13 @@ class ArticleLikeController extends Controller
         //check article
         $article = Article::find($request->article_id);
         if(!$article){
-            return sendResponse(404,'Article not found');
+            return sendResponse(null,404,'Article not found');
         }
 
         //check liked or not
         $check = $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->first();
         if($check){
-            return sendResponse(405,'You already liked this article');
+            return sendResponse(null,405,'You already liked this article');
         }
 
         //create like
@@ -44,11 +44,11 @@ class ArticleLikeController extends Controller
         //check article
         $article = Article::find($request->article_id);
         if(!$article){
-            return sendResponse(404,'Article not found');
+            return sendResponse(null,404,'Article not found');
         }
 
         //delete like
         $this->model->where('article_id',$request->article_id)->where('user_id',Auth::user()->id)->delete();
-        return sendResponse(200,'You unliked this article');
+        return sendResponse(null,200,'You unliked this article');
     }
 }

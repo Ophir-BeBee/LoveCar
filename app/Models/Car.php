@@ -30,4 +30,9 @@ class Car extends Model
     public function fuel_costs(){
         return $this->hasMany(FuelCost::class);
     }
+
+    //connect with checklist
+    public function check_lists(){
+        return $this->hasMany(CheckList::class);
+    }
 }

@@ -26,7 +26,7 @@ class ShopAdController extends Controller
         ->with('shop:id,name,address,logo')
         ->get();
         if(count($data)==0){
-            return sendResponse(404,'There is no shop ads');
+            return sendResponse(null,404,'There is no shop ads');
         }
         return sendResponse(ShopAdResource::collection($data),200);
     }
@@ -35,19 +35,19 @@ class ShopAdController extends Controller
     public function store(ShopAdRequest $request){
         //user authorization
         if(Gate::denies('auth-shopAds')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //check shop
         $shop = Shop::find($request->shop_id);
         if(!$shop){
-            return sendResponse(404,'Shop not found');
+            return sendResponse(null,404,'Shop not found');
         }
 
         //check ads
         $shopAds = $this->model->where('shop_id',$request->shop_id)->first();
         if($shopAds){
-            return sendResponse(405,'This shop already has ads');
+            return sendResponse(null,405,'This shop already has ads');
         }
 
         //create shop ad
@@ -76,13 +76,13 @@ class ShopAdController extends Controller
     public function update(ShopAdRequest $request){
         //user authorization
         if(Gate::denies('auth-shopAds')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //check ads
         $shopAds = $this->model->where('id',$request->shopAds_id)->first();
         if(!$shopAds){
-            return sendResponse(404,'Shop ads not found');
+            return sendResponse(null,404,'Shop ads not found');
         }
 
         //delete image
@@ -114,20 +114,20 @@ class ShopAdController extends Controller
     public function destroy(Request $request){
         //user authorization
         if(Gate::denies('auth-shopAds')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //check ads
         $shopAds = $this->model->where('id',$request->shopAds_id)->first();
         if(!$shopAds){
-            return sendResponse(404,'Shop ads not found');
+            return sendResponse(null,404,'Shop ads not found');
         }
 
         //delete ads
         $shopAds = $this->model->find($shopAds->id);
         Storage::delete('public/'.$shopAds->image);
         $shopAds->delete();
-        return sendResponse(200,'ShopAds has been deleted');
+        return sendResponse(null,200,'ShopAds has been deleted');
     }
 
     //change shop ads data to array

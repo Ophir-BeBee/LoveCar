@@ -75,7 +75,7 @@ class ShopController extends Controller
     public function store(ShopRequest $request){
         //user authorization
         if(Gate::denies('auth-shop')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //assign array data
@@ -135,7 +135,7 @@ class ShopController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>5){
-                return sendResponse(405,"Can't upload more than 5 photos");
+                return sendResponse(null,405,"Can't upload more than 5 photos");
             }
 
             //store images
@@ -173,12 +173,12 @@ class ShopController extends Controller
     public function update(ShopRequest $request){
         //user authorization
         if(Gate::denies('auth-shop')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         $shop = $this->model->find($request->shop_id);
         if(!$shop){
-            return sendResponse(404,'Shop not found');
+            return sendResponse(null,404,'Shop not found');
         }
 
         //logo check and delete
@@ -256,7 +256,7 @@ class ShopController extends Controller
             //four images validation
             $imageCount = count($imageFile);
             if($imageCount>5){
-                return sendResponse(405,"Can't upload more than 5 photos");
+                return sendResponse(null,405,"Can't upload more than 5 photos");
             }
 
             //store images
@@ -292,7 +292,7 @@ class ShopController extends Controller
     public function destroy(Request $request){
         //user authorization
         if(Gate::denies('auth-shop')){
-            return sendResponse(401,'Not allowed');
+            return sendResponse(null,401,'Not allowed');
         }
 
         //image manual delete
@@ -310,7 +310,7 @@ class ShopController extends Controller
 
         //delete shop
         $shop->delete();
-        return sendResponse(200,'Shop has been deleted');
+        return sendResponse(null,200,'Shop has been deleted');
     }
 
     //change shop update data to array
