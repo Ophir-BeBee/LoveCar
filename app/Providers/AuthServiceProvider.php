@@ -44,12 +44,12 @@ class AuthServiceProvider extends ServiceProvider
 
         //comment authorization
         Gate::define('auth-comment',function(User $user,Comment $comment){
-            return ($user->type === 'admin' || $comment->user_id === $user->id) ? true : false;
+            return ($user->type === 'admin' || $comment->user_id === $user->id);
         });
 
         //shop autorization
         Gate::define('auth-shop',function(User $user){
-            return ($user->type === 'admin' || $user->type === 'bussiness_ower') ? true : false;
+            return ($user->type === 'admin' || $user->type === 'bussiness_ower');
         });
 
         //notification authorization
@@ -69,7 +69,7 @@ class AuthServiceProvider extends ServiceProvider
 
         //shop rating delete authorization
         Gate::define('auth-rating-delete',function(User $user,Shop $shop){
-            return ($user->type === 'admin' || $shop->user_id === Auth::user()->id) ? true : false;
+            return ($user->type === 'admin' || $shop->user_id === Auth::user()->id);
         });
 
         //shop category authorization
@@ -79,7 +79,7 @@ class AuthServiceProvider extends ServiceProvider
 
         //shop category service
         Gate::define('auth-shop-service',function(User $user){
-            return ($user->type === 'admin' || $user->type === 'bussiness_owner') ? true : false;
+            return ($user->type === 'admin' || $user->type === 'bussiness_owner');
         });
 
         //car update authorization
@@ -89,7 +89,7 @@ class AuthServiceProvider extends ServiceProvider
 
         //car delete authorization
         Gate::define('auth-car-delete',function(User $user,Car $car){
-            return ($car->user_id === $user->id || $user->type === 'admin') ? true : false;
+            return ($car->user_id === $user->id || $user->type === 'admin');
         });
 
         //fuel cost authorization
@@ -99,7 +99,7 @@ class AuthServiceProvider extends ServiceProvider
 
         //fuel cost delete authorization
         Gate::define('auth-car-fuel_cost-delete',function(User $user,Car $car){
-            return ($user->type === 'admin' || $car->user_id === $user->id) ? true : false;
+            return ($user->type === 'admin' || $car->user_id === $user->id);
         });
 
         //servicing cost authorization
