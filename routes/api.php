@@ -22,6 +22,7 @@ use App\Http\Controllers\ShopCategoryController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ShopServiceController;
 use App\Http\Controllers\TutorialController;
+use App\Http\Controllers\TutorialLikeController;
 
 Route::controller(UserController::class)->group(function(){
     Route::post('/login','login');
@@ -80,6 +81,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/','store');
         Route::post('/update','update');
         Route::delete('/','destroy');
+
+        //likes
+        Route::group(["prefix" => "likes", "controller" => TutorialLikeController::class],function(){
+           Route::post('/','toggle');
+        });
     });
 
     //shops
