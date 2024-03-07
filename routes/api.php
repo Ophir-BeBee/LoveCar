@@ -21,6 +21,7 @@ use App\Http\Controllers\ShopAdController;
 use App\Http\Controllers\ShopCategoryController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\ShopServiceController;
+use App\Http\Controllers\TutorialController;
 
 Route::controller(UserController::class)->group(function(){
     Route::post('/login','login');
@@ -70,6 +71,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::group(["prefix" => "likes", "controller" => ArticleLikeController::class],function(){
             Route::post('/','toggle');
         });
+    });
+
+    //tutorials
+    Route::group(["prefix" => "tutorials", "controller" => TutorialController::class],function(){
+        //tutorials
+        Route::get('/','index');
+        Route::post('/','store');
+        Route::post('/update','update');
+        Route::delete('/','destroy');
     });
 
     //shops
@@ -172,10 +182,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //notifications
     Route::group(["prefix" => "notifications", "controller" => NotificationController::class],function(){
-        Route::get('/','index');
+        Route::get('/{page}','index');
         Route::post('/','store');
         Route::delete('/','destroy');
-        Route::get('/{id}','show');
         Route::post('/update','update');
         Route::post('/read','read');
         Route::post('/hide','hide');

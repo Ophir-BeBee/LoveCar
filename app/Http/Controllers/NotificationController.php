@@ -22,7 +22,7 @@ class NotificationController extends Controller
     }
 
     //index
-    public function index(){
+    public function index($page){
         $data = $this->model
         ->where(function ($query) {
             $query->whereNull('to_user_id')
@@ -37,7 +37,7 @@ class NotificationController extends Controller
         ->withCount(['read_notifications as is_read' => function($query){
             $query->where('read_notifications.user_id',Auth::user()->id);
         }])
-        ->paginate(20);
+        ->paginate(20, ['*'], 'page', $page);
         return sendResponse($data,200);
     }
 
@@ -66,13 +66,14 @@ class NotificationController extends Controller
 
         //update data
         $notification->update($this->changeNotificationDataToArray($request));
-        return sendResponse($notification,200,'Notification update success');
-    }
 
-    //notification show
-    public function show($id){
-        $notification = $this->model->find($id);
-        return sendResponse($notification,200);
+        $data = $this->model
+        ->where('id',$request->id)
+        ->withCount(['read_notifications as is_read' => function($query){
+            $query->where('read_notifications.user_id',Auth::user()->id);
+        }])
+        ->first();
+        return sendResponse($data,200,'Notification update success');
     }
 
     //read notification
@@ -84,15 +85,20 @@ class NotificationController extends Controller
         }
 
         //check read
-        $check = ReadNotification::where('notifications_id',$notification->id)->where('user_id',Auth::user()->id);
-        if($check){
-            return sendResponse(null,405,'You already read this notification');
+        $check = ReadNotification::where('notification_id',$notification->id)->where('user_id',Auth::user()->id)->first();
+        if(!$check){
+            ReadNotification::create([
+                'user_id' => Auth::user()->id,
+                'notification_id' => $request->notification_id
+            ]);
         }
 
-        $data = ReadNotification::create([
-            'user_id' => Auth::user()->id,
-            'notification_id' => $request->notification_id
-        ]);
+        $data = $this->model
+        ->where('id',$request->notification_id)
+        ->withCount(['read_notifications as is_read' => function($query){
+            $query->where('read_notifications.user_id',Auth::user()->id);
+        }])
+        ->first();
         return sendResponse($data,200,'You read this notification');
     }
 

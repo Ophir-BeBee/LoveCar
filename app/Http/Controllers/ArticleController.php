@@ -57,10 +57,6 @@ class ArticleController extends Controller
             return sendResponse(null,401,"Not allowed");
         }
 
-        //create data or article
-        $data = $this->changeArticleCreateDataToArray($request);
-        $article = $this->model->create($data);
-
         //check photos inclued or not
         if($request->file('image')){
 
@@ -71,6 +67,10 @@ class ArticleController extends Controller
             if($imageCount>4){
                 return sendResponse(null,405,"Can't upload more than 4 photos");
             }
+
+            //create data or article
+            $data = $this->changeArticleCreateDataToArray($request);
+            $article = $this->model->create($data);
 
             //store photos
             for($i=0;$i<$imageCount;$i++){

@@ -37,6 +37,11 @@ class AuthServiceProvider extends ServiceProvider
             return $user->type ===  'admin';
         });
 
+        //tutorial authorization
+        Gate::define('auth-tutorial',function(User $user){
+            return $user->type ===  'admin';
+        });
+
         //comment authorization
         Gate::define('auth-comment',function(User $user,Comment $comment){
             return ($user->type === 'admin' || $comment->user_id === $user->id) ? true : false;
