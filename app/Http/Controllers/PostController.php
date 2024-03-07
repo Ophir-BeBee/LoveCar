@@ -46,10 +46,6 @@ class PostController extends Controller
             return sendResponse(null,401,'Not allowed');
         }
 
-        //create data of posts
-        $data = $this->changePostCreateDataToArray($request);
-        $post = $this->model->create($data);
-
         //check photos inclued or not
         if($request->file('image')){
 
@@ -60,6 +56,10 @@ class PostController extends Controller
             if($imageCount>4){
                 return sendResponse(null,405,"Can't upload more than 4 photos");
             }
+
+            //create data of posts
+            $data = $this->changePostCreateDataToArray($request);
+            $post = $this->model->create($data);
 
             //store images
             for($i=0;$i<$imageCount;$i++){
