@@ -22,7 +22,7 @@ class TutorialResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'is_liked' => $this->is_liked,
-            'likes' => $this->tutorial_likes_count,
+            'tutorial_likes_count' => $this->tutorial_likes_count,
             'steps' => TutorialStepResource::collection($this->tutorial_steps)
         ];
     }

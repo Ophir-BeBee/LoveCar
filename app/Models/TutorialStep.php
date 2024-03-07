@@ -9,7 +9,7 @@ class TutorialStep extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tutorial_id','step_label','step_image'];
+    protected $fillable = ['tutorial_id','step_title','step_description','step_image'];
 
     //connect with tutorial
     public function tutorial(){

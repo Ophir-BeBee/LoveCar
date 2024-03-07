@@ -1,28 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CarController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SaveController;
+use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ShopAdController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\PostLikeController;
-use App\Http\Controllers\ArticleLikeController;
-use App\Http\Controllers\CarController;
-use App\Http\Controllers\CarServicingCostController;
-use App\Http\Controllers\CheckListController;
-use App\Http\Controllers\FavoriteShopController;
 use App\Http\Controllers\FuelCostController;
-use App\Http\Controllers\IncomeController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\RatingController;
-use App\Http\Controllers\RentalCostController;
-use App\Http\Controllers\ShopAdController;
-use App\Http\Controllers\ShopCategoryController;
-use App\Http\Controllers\ShopController;
-use App\Http\Controllers\ShopServiceController;
+use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\TutorialController;
+use App\Http\Controllers\CheckListController;
+use App\Http\Controllers\RentalCostController;
+use App\Http\Controllers\ArticleLikeController;
+use App\Http\Controllers\ShopServiceController;
+use App\Http\Controllers\FavoriteShopController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ShopCategoryController;
 use App\Http\Controllers\TutorialLikeController;
+use App\Http\Controllers\CarServicingCostController;
 
 Route::controller(UserController::class)->group(function(){
     Route::post('/login','login');

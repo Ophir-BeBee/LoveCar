@@ -17,7 +17,8 @@ class TutorialStepResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'label' => $this->step_label,
+            'title' => $this->step_title,
+            'description' => $this->step_description,
             'image' => config('base_url')."storage/".$this->step_image
         ];
     }

@@ -24,7 +24,7 @@ class TutorialController extends Controller
     //get all tutorials
     public function index(){
         $data = $this->model
-        ->with('tutorial_steps:id,tutorial_id,step_label,step_image')
+        ->with('tutorial_steps:id,tutorial_id,step_title,step_description,step_image')
         ->withCount('tutorial_likes')
         ->withCount(['tutorial_likes as is_liked' => function($query){
             $query->where('tutorial_likes.user_id',Auth::user()->id);
@@ -80,15 +80,19 @@ class TutorialController extends Controller
             $imageFile[0]->storeAs('public',$imageName);
             TutorialStep::create([
                 'tutorial_id' => $tutorial->id,
-                'step_label' => $tutorial_step['label'],
+                'step_title' => $tutorial_step['title'],
+                'step_description' => $tutorial_step['description'],
                 'step_image' => $imageName,
             ]);
         }
 
         $data = $this->model
         ->where('id',$tutorial->id)
-        ->with('tutorial_steps:id,tutorial_id,step_label,step_image')
+        ->with('tutorial_steps:id,tutorial_id,step_title,step_description,step_image')
         ->withCount('tutorial_likes')
+        ->withCount(['tutorial_likes as is_liked' => function($query){
+            $query->where('tutorial_likes.user_id',Auth::user()->id);
+        }])
         ->first();
         return sendResponse(new TutorialResource($data),200,'Tutorial creation success');
     }
@@ -146,14 +150,18 @@ class TutorialController extends Controller
             $imageFile[0]->storeAs('public',$imageName);
             TutorialStep::create([
                 'tutorial_id' => $tutorial->id,
-                'step_label' => $tutorial_step['label'],
+                'step_title' => $tutorial_step['title'],
+                'step_description' => $tutorial_step['description'],
                 'step_image' => $imageName,
             ]);
         }
         $data = $this->model
         ->where('id',$tutorial->id)
-        ->with('tutorial_steps:id,tutorial_id,step_label,step_image')
+        ->with('tutorial_steps:id,tutorial_id,step_title,step_description,step_image')
         ->withCount('tutorial_likes')
+        ->withCount(['tutorial_likes as is_liked' => function($query){
+            $query->where('tutorial_likes.user_id',Auth::user()->id);
+        }])
         ->first();
         return sendResponse(new TutorialResource($data),200,'Tutorial updated success');
     }

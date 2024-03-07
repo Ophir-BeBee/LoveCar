@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('tutorial_steps', function (Blueprint $table) {
             $table->id();
             $table->integer('tutorial_id')->constrained()->references('id')->on('tutorials')->cascadeOnDelete();
-            $table->string('step_label')->nullable();
+            $table->string('step_title')->nullable();
+            $table->longText('step_description')->nullable();
             $table->string('step_image')->nullable();
             $table->timestamps();
         });
